@@ -3,6 +3,9 @@ target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+#### To ignor ####
+development_order.md
+database_definition_for_v1.md
 
 ### STS ###
 .apt_generated
