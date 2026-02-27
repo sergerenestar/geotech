@@ -4,8 +4,7 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 #### To ignor ####
-development_order.md
-database_definition_for_v1.md
+docs/*
 
 ### STS ###
 .apt_generated
