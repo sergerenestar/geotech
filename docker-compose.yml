@@ -1,0 +1,303 @@
+name: geotech-lab
+
+services:
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: geotech-db
+    command: postgres -c max_connections=300
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-geotech}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      POSTGRES_DB: ${POSTGRES_DB:-geotechdb}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infra/docker/init-schemas.sql:/docker-entrypoint-initdb.d/init-schemas.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-geotech} -d ${POSTGRES_DB:-geotechdb}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [geotech-net]
+
+  nginx:
+    build:
+      context: ./infra/nginx
+      dockerfile: Dockerfile
+    container_name: geotech-gateway
+    ports:
+      - "8888:80"
+    depends_on:
+      - auth-service
+      - project-service
+      - web
+    networks: [geotech-net]
+
+  auth-service:
+    build:
+      context: ./services/auth-service
+      dockerfile: Dockerfile
+    container_name: geotech-auth
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-geotechdb}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-geotech}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?JWT_REFRESH_SECRET is required}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [geotech-net]
+
+  project-service:
+    build:
+      context: ./services/project-service
+      dockerfile: Dockerfile
+    container_name: geotech-project
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-geotechdb}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-geotech}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?}
+      JWT_SECRET: ${JWT_SECRET:?}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [geotech-net]
+
+  test-wc-service:
+    build:
+      context: ./services/test-wc-service
+      dockerfile: Dockerfile
+    container_name: geotech-test-wc
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-geotechdb}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-geotech}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?}
+      JWT_SECRET: ${JWT_SECRET:?}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [geotech-net]
+
+  test-ll-service:
+    build:
+      context: ./services/test-ll-service
+      dockerfile: Dockerfile
+    container_name: geotech-test-ll
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-geotechdb}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-geotech}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?}
+      JWT_SECRET: ${JWT_SECRET:?}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [geotech-net]
+
+  test-proctor-service:
+    build:
+      context: ./services/test-proctor-service
+      dockerfile: Dockerfile
+    container_name: geotech-test-proctor
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-geotechdb}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-geotech}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?}
+      JWT_SECRET: ${JWT_SECRET:?}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [geotech-net]
+
+  test-sg-service:
+    build:
+      context: ./services/test-sg-service
+      dockerfile: Dockerfile
+    container_name: geotech-test-sg
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-geotechdb}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-geotech}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?}
+      JWT_SECRET: ${JWT_SECRET:?}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [geotech-net]
+
+  test-ps-service:
+    build:
+      context: ./services/test-ps-service
+      dockerfile: Dockerfile
+    container_name: geotech-test-ps
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-geotechdb}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-geotech}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?}
+      JWT_SECRET: ${JWT_SECRET:?}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [geotech-net]
+
+  test-perm-service:
+    build:
+      context: ./services/test-perm-service
+      dockerfile: Dockerfile
+    container_name: geotech-test-perm
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-geotechdb}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-geotech}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?}
+      JWT_SECRET: ${JWT_SECRET:?}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [geotech-net]
+
+  test-uc-service:
+    build:
+      context: ./services/test-uc-service
+      dockerfile: Dockerfile
+    container_name: geotech-test-uc
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-geotechdb}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-geotech}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?}
+      JWT_SECRET: ${JWT_SECRET:?}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [geotech-net]
+
+  test-ds-service:
+    build:
+      context: ./services/test-ds-service
+      dockerfile: Dockerfile
+    container_name: geotech-test-ds
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-geotechdb}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-geotech}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?}
+      JWT_SECRET: ${JWT_SECRET:?}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [geotech-net]
+
+  test-cbr-service:
+    build:
+      context: ./services/test-cbr-service
+      dockerfile: Dockerfile
+    container_name: geotech-test-cbr
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-geotechdb}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-geotech}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?}
+      JWT_SECRET: ${JWT_SECRET:?}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [geotech-net]
+
+  test-consol-service:
+    build:
+      context: ./services/test-consol-service
+      dockerfile: Dockerfile
+    container_name: geotech-test-consol
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-geotechdb}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-geotech}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?}
+      JWT_SECRET: ${JWT_SECRET:?}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [geotech-net]
+
+  report-service:
+    build:
+      context: ./services/report-service
+      dockerfile: Dockerfile
+    container_name: geotech-report
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-geotechdb}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-geotech}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?}
+      JWT_SECRET: ${JWT_SECRET:?}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [geotech-net]
+
+  ai-assistant-service:
+    build:
+      context: ./services/ai-assistant-service
+      dockerfile: Dockerfile
+    container_name: geotech-ai
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-geotechdb}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-geotech}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?}
+      JWT_SECRET: ${JWT_SECRET:?}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [geotech-net]
+
+  media-service:
+    build:
+      context: ./services/media-service
+      dockerfile: Dockerfile
+    container_name: geotech-media
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-geotechdb}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-geotech}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?}
+      JWT_SECRET: ${JWT_SECRET:?}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET:-geotech-media-dev}
+      AWS_REGION: ${AWS_REGION:-ca-central-1}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [geotech-net]
+
+  notification-service:
+    build:
+      context: ./services/notification-service
+      dockerfile: Dockerfile
+    container_name: geotech-notify
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-geotechdb}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-geotech}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?}
+      JWT_SECRET: ${JWT_SECRET:?}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [geotech-net]
+
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost}
+    container_name: geotech-web
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost}
+      BACKEND_URL: http://auth-service:8080
+      NODE_ENV: production
+      COOKIE_SECURE: "false"
+    depends_on:
+      - auth-service
+    networks: [geotech-net]
+
+volumes:
+  postgres_data:
+
+networks:
+  geotech-net:
+    driver: bridge

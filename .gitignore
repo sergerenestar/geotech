@@ -1,0 +1,63 @@
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Node
+node_modules/
+.pnpm-store/
+dist/
+.next/
+.turbo/
+*.tsbuildinfo
+
+# Java / Maven
+target/
+*.class
+*.jar
+*.war
+*.ear
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Docker
+docker-compose.override.yml
+
+# Logs
+*.log
+logs/
+
+# Expo / React Native
+.expo/
+android/
+ios/
+
+# Test artifacts
+coverage/
+test-results/
+
+# Claude Code internal
+.claude/
+
+# Design tools
+.specify/
+
+# Planning & reference docs (not app code)
+AAAAAAA.md
+CONSTITUTION.md
+PLAN_GNT_ALIGNMENT.md
+claude-code-prompt.md
+test-workflow-spec.md
+test-workflow-reference.html
+
+# Raw data files
+ESSAI_GNT_IC.xlsx

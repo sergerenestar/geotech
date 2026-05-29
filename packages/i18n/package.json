@@ -1,0 +1,10 @@
+{
+  "name": "@geotech/i18n",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./src/index.js",
+  "exports": {
+    "./fr": "./src/fr.json",
+    "./en": "./src/en.json"
+  }
+}

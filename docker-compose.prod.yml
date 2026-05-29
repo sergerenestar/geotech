@@ -1,0 +1,94 @@
+name: geotech-lab
+
+services:
+
+  postgres:
+    restart: unless-stopped
+
+  nginx:
+    image: ghcr.io/${GITHUB_REPO}/geotech-gateway:${DEPLOY_SHA:-latest}
+    build: !reset null
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+
+  auth-service:
+    image: ghcr.io/${GITHUB_REPO}/geotech-auth:${DEPLOY_SHA:-latest}
+    build: !reset null
+    restart: unless-stopped
+
+  project-service:
+    image: ghcr.io/${GITHUB_REPO}/geotech-project:${DEPLOY_SHA:-latest}
+    build: !reset null
+    restart: unless-stopped
+
+  test-wc-service:
+    image: ghcr.io/${GITHUB_REPO}/geotech-test-wc:${DEPLOY_SHA:-latest}
+    build: !reset null
+    restart: unless-stopped
+
+  test-ll-service:
+    image: ghcr.io/${GITHUB_REPO}/geotech-test-ll:${DEPLOY_SHA:-latest}
+    build: !reset null
+    restart: unless-stopped
+
+  test-proctor-service:
+    image: ghcr.io/${GITHUB_REPO}/geotech-test-proctor:${DEPLOY_SHA:-latest}
+    build: !reset null
+    restart: unless-stopped
+
+  test-sg-service:
+    image: ghcr.io/${GITHUB_REPO}/geotech-test-sg:${DEPLOY_SHA:-latest}
+    build: !reset null
+    restart: unless-stopped
+
+  test-ps-service:
+    image: ghcr.io/${GITHUB_REPO}/geotech-test-ps:${DEPLOY_SHA:-latest}
+    build: !reset null
+    restart: unless-stopped
+
+  test-perm-service:
+    image: ghcr.io/${GITHUB_REPO}/geotech-test-perm:${DEPLOY_SHA:-latest}
+    build: !reset null
+    restart: unless-stopped
+
+  test-uc-service:
+    image: ghcr.io/${GITHUB_REPO}/geotech-test-uc:${DEPLOY_SHA:-latest}
+    build: !reset null
+    restart: unless-stopped
+
+  test-ds-service:
+    image: ghcr.io/${GITHUB_REPO}/geotech-test-ds:${DEPLOY_SHA:-latest}
+    build: !reset null
+    restart: unless-stopped
+
+  test-consol-service:
+    image: ghcr.io/${GITHUB_REPO}/geotech-test-consol:${DEPLOY_SHA:-latest}
+    build: !reset null
+    restart: unless-stopped
+
+  report-service:
+    image: ghcr.io/${GITHUB_REPO}/geotech-report:${DEPLOY_SHA:-latest}
+    build: !reset null
+    restart: unless-stopped
+
+  ai-assistant-service:
+    image: ghcr.io/${GITHUB_REPO}/geotech-ai:${DEPLOY_SHA:-latest}
+    build: !reset null
+    restart: unless-stopped
+
+  media-service:
+    image: ghcr.io/${GITHUB_REPO}/geotech-media:${DEPLOY_SHA:-latest}
+    build: !reset null
+    restart: unless-stopped
+
+  notification-service:
+    image: ghcr.io/${GITHUB_REPO}/geotech-notify:${DEPLOY_SHA:-latest}
+    build: !reset null
+    restart: unless-stopped
+
+  web:
+    image: ghcr.io/${GITHUB_REPO}/geotech-web:${DEPLOY_SHA:-latest}
+    build: !reset null
+    restart: unless-stopped

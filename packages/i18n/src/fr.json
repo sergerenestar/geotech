@@ -1,0 +1,169 @@
+{
+  "nav": {
+    "projects": "Projets",
+    "boreholes": "Forages",
+    "samples": "Échantillons",
+    "clients": "Clients",
+    "locations": "Emplacements",
+    "users": "Utilisateurs",
+    "reports": "Rapports",
+    "dashboard": "Tableau de bord",
+    "profile": "Profil",
+    "logout": "Déconnexion"
+  },
+  "tests": {
+    "waterContent": "Teneur en eau",
+    "liquidLimit": "Limite de liquidité",
+    "plasticLimit": "Limite de plasticité",
+    "liquidPlasticLimit": "Limites d'Atterberg (LL / LP)",
+    "proctor": "Essai Proctor",
+    "specificGravity": "Densité des grains",
+    "particleSize": "Granulométrie",
+    "permeability": "Perméabilité",
+    "unconfinedCompression": "Compression simple",
+    "directShear": "Cisaillement direct",
+    "consolidation": "Consolidation",
+    "sidebar": {
+      "bhManager": "Gestion des forages",
+      "waterContent": "Teneur en eau",
+      "llPl": "LL / LP",
+      "proctor": "Proctor",
+      "specificGravity": "Densité des grains",
+      "particleSize": "Granulométrie",
+      "permeability": "Perméabilité",
+      "compression": "Compression simple",
+      "directShear": "Cisaillement direct",
+      "consolidation": "Consolidation"
+    }
+  },
+  "status": {
+    "project": {
+      "DRAFT": "Brouillon",
+      "ACTIVE": "Actif",
+      "IN_LAB": "Au laboratoire",
+      "ANALYSIS": "En analyse",
+      "COMPLETED": "Complété",
+      "ARCHIVED": "Archivé",
+      "CANCELLED": "Annulé"
+    },
+    "test": {
+      "PENDING_REVIEW": "En attente de révision",
+      "FLAGGED": "Signalé",
+      "APPROVED": "Approuvé",
+      "REJECTED": "Rejeté",
+      "LOCKED": "Verrouillé"
+    },
+    "user": {
+      "PENDING": "En attente",
+      "ACTIVE": "Actif",
+      "INACTIVE": "Inactif"
+    }
+  },
+  "roles": {
+    "USER": "Technicien",
+    "LAB_MANAGER": "Responsable de laboratoire",
+    "ADMIN": "Administrateur"
+  },
+  "actions": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "add": "Ajouter",
+    "create": "Créer",
+    "apply": "Appliquer",
+    "calculate": "Calculer",
+    "applyAndCalculate": "Appliquer et calculer",
+    "generate": "Générer",
+    "download": "Télécharger",
+    "approve": "Approuver",
+    "reject": "Rejeter",
+    "lock": "Verrouiller",
+    "confirm": "Confirmer",
+    "back": "Retour",
+    "next": "Suivant",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "export": "Exporter",
+    "paste": "Coller"
+  },
+  "units": {
+    "gr": "gr",
+    "kg": "kg",
+    "pct": "%",
+    "mm": "mm",
+    "cm": "cm",
+    "m": "m",
+    "kPa": "kPa",
+    "gCm3": "g/cm³",
+    "kCmS": "cm/s",
+    "degC": "°C",
+    "blows": "coups"
+  },
+  "fields": {
+    "borehole": "Forage",
+    "sample": "Échantillon",
+    "projectCode": "Code de projet",
+    "startDate": "Date de début",
+    "endDate": "Date de fin",
+    "performedBy": "Réalisé par",
+    "performedAt": "Réalisé le",
+    "createdAt": "Créé le",
+    "updatedAt": "Mis à jour le",
+    "containerLabel": "No. conteneur",
+    "massContainer": "Masse du conteneur (g)",
+    "massContainerWet": "Masse conteneur + sol humide (g)",
+    "massContainerDry": "Masse conteneur + sol sec (g)",
+    "massWater": "Masse de l'eau (g)",
+    "massDrySoil": "Masse du sol sec (g)",
+    "waterContentPct": "Teneur en eau (%)",
+    "averageWaterContent": "Teneur en eau moyenne (%)",
+    "blows": "Nombre de coups",
+    "liquidLimit": "Limite de liquidité (%)",
+    "plasticLimit": "Limite de plasticité (%)",
+    "plasticityIndex": "Indice de plasticité (%)",
+    "activity": "Activité",
+    "liquidityIndex": "Indice de liquidité",
+    "gs": "Densité des grains (Gs)",
+    "temperature": "Température (°C)",
+    "uscs": "Classification USCS",
+    "aashto": "Classification AASHTO",
+    "qu": "Résistance à la compression simple qu (kPa)",
+    "su": "Cohésion non drainée Su (kPa)",
+    "cohesion": "Cohésion c (kPa)",
+    "frictionAngle": "Angle de frottement φ (°)"
+  },
+  "errors": {
+    "required": "Ce champ est obligatoire",
+    "mustBePositive": "La valeur doit être positive",
+    "mustBeNumber": "La valeur doit être un nombre",
+    "waterContentNegative": "La teneur en eau ne peut pas être négative",
+    "waterContentHigh": "Teneur en eau > 100% inhabituelle pour un sol non organique",
+    "waterContentMax": "La valeur dépasse la plage physiquement plausible",
+    "drySoilMassZero": "La masse de sol sec doit être positive",
+    "minReadings": "Au moins {{count}} détermination(s) requise(s)",
+    "unauthorized": "Accès non autorisé",
+    "notFound": "Élément introuvable",
+    "serverError": "Erreur serveur. Veuillez réessayer."
+  },
+  "report": {
+    "generate": "Générer le rapport",
+    "download": "Télécharger le rapport",
+    "type": {
+      "testsSummary": "Résumé des essais",
+      "waterContent": "Rapport de teneur en eau",
+      "liquidLimit": "Rapport des limites d'Atterberg",
+      "proctor": "Rapport Proctor",
+      "specificGravity": "Rapport de densité des grains",
+      "particleSize": "Rapport de granulométrie",
+      "permeability": "Rapport de perméabilité",
+      "unconfinedCompression": "Rapport de compression simple",
+      "directShear": "Rapport de cisaillement direct",
+      "consolidation": "Rapport de consolidation"
+    },
+    "language": {
+      "fr": "Français",
+      "en": "English"
+    }
+  }
+}

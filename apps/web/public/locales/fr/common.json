@@ -1,0 +1,72 @@
+{
+  "nav": {
+    "projects": "Projets",
+    "users": "Utilisateurs",
+    "logout": "Déconnexion",
+    "settings": "Paramètres"
+  },
+  "auth": {
+    "login": "Se connecter",
+    "email": "Adresse email",
+    "password": "Mot de passe",
+    "loading": "Connexion...",
+    "noAccount": "Pas de compte ? Contactez votre administrateur.",
+    "tagline": "Plateforme de gestion géotechnique"
+  },
+  "projects": {
+    "title": "Mes Projets",
+    "new": "+ Nouveau projet",
+    "search": "Rechercher...",
+    "empty": "Aucun projet trouvé.",
+    "loading": "Chargement...",
+    "code": "Code",
+    "name": "Nom",
+    "status": "Statut",
+    "description": "Description",
+    "modal": {
+      "title": "Nouveau projet",
+      "cancel": "Annuler",
+      "create": "Créer",
+      "creating": "Création..."
+    }
+  },
+  "boreholes": {
+    "title": "Forages",
+    "empty": "Aucun forage enregistré.",
+    "samples": "éch."
+  },
+  "status": {
+    "project": {
+      "DRAFT": "Brouillon",
+      "ACTIVE": "Actif",
+      "ON_HOLD": "En attente",
+      "COMPLETED": "Terminé",
+      "ARCHIVED": "Archivé",
+      "CANCELLED": "Annulé",
+      "PENDING_REVIEW": "En révision"
+    },
+    "user": {
+      "PENDING": "En attente",
+      "ACTIVE": "Actif",
+      "INACTIVE": "Inactif"
+    }
+  },
+  "roles": {
+    "USER": "Utilisateur",
+    "LAB_MANAGER": "Chef de labo",
+    "ADMIN": "Administrateur"
+  },
+  "actions": {
+    "approve": "Approuver",
+    "deactivate": "Désactiver",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "save": "Enregistrer",
+    "cancel": "Annuler"
+  },
+  "errors": {
+    "generic": "Une erreur est survenue.",
+    "loginFailed": "Email ou mot de passe incorrect.",
+    "unauthorized": "Session expirée. Veuillez vous reconnecter."
+  }
+}

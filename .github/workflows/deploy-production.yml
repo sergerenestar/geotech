@@ -1,0 +1,48 @@
+name: Deploy to Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      service:
+        description: 'Service to deploy (e.g. auth-service, or "all" for full stack)'
+        required: true
+        default: 'all'
+      sha:
+        description: 'Image SHA to deploy (defaults to latest)'
+        required: false
+        default: 'latest'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to production VPS
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_USER }}
+          key: ${{ secrets.PROD_SSH_KEY }}
+          script: |
+            set -e
+            cd /opt/geotech-lab
+
+            # Pull latest config
+            git pull origin main
+
+            export DEPLOY_SHA=${{ inputs.sha }}
+            export GITHUB_REPO=${{ github.repository }}
+
+            if [ "${{ inputs.service }}" = "all" ]; then
+              docker compose -f docker-compose.yml -f docker-compose.prod.yml pull
+              docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+            else
+              docker compose -f docker-compose.yml -f docker-compose.prod.yml pull ${{ inputs.service }}
+              docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --no-deps ${{ inputs.service }}
+            fi
+
+            docker system prune -f
+            echo "Deploy complete: ${{ inputs.service }} @ ${{ inputs.sha }}"

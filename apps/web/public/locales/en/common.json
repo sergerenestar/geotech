@@ -1,0 +1,72 @@
+{
+  "nav": {
+    "projects": "Projects",
+    "users": "Users",
+    "logout": "Logout",
+    "settings": "Settings"
+  },
+  "auth": {
+    "login": "Sign in",
+    "email": "Email address",
+    "password": "Password",
+    "loading": "Signing in...",
+    "noAccount": "No account? Contact your administrator.",
+    "tagline": "Geotechnical Laboratory Management Platform"
+  },
+  "projects": {
+    "title": "My Projects",
+    "new": "+ New project",
+    "search": "Search...",
+    "empty": "No projects found.",
+    "loading": "Loading...",
+    "code": "Code",
+    "name": "Name",
+    "status": "Status",
+    "description": "Description",
+    "modal": {
+      "title": "New project",
+      "cancel": "Cancel",
+      "create": "Create",
+      "creating": "Creating..."
+    }
+  },
+  "boreholes": {
+    "title": "Boreholes",
+    "empty": "No boreholes recorded.",
+    "samples": "samples"
+  },
+  "status": {
+    "project": {
+      "DRAFT": "Draft",
+      "ACTIVE": "Active",
+      "ON_HOLD": "On Hold",
+      "COMPLETED": "Completed",
+      "ARCHIVED": "Archived",
+      "CANCELLED": "Cancelled",
+      "PENDING_REVIEW": "Pending Review"
+    },
+    "user": {
+      "PENDING": "Pending",
+      "ACTIVE": "Active",
+      "INACTIVE": "Inactive"
+    }
+  },
+  "roles": {
+    "USER": "User",
+    "LAB_MANAGER": "Lab Manager",
+    "ADMIN": "Administrator"
+  },
+  "actions": {
+    "approve": "Approve",
+    "deactivate": "Deactivate",
+    "delete": "Delete",
+    "edit": "Edit",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "errors": {
+    "generic": "An error occurred.",
+    "loginFailed": "Invalid email or password.",
+    "unauthorized": "Session expired. Please sign in again."
+  }
+}

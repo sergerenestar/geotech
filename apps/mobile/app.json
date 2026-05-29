@@ -1,0 +1,30 @@
+{
+  "expo": {
+    "name": "GeoTech Lab",
+    "slug": "geotech-lab",
+    "version": "1.0.0",
+    "scheme": "geotech",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#0F62FE"
+    },
+    "android": {
+      "package": "com.lab.geotech",
+      "adaptiveIcon": {
+        "backgroundColor": "#0F62FE"
+      }
+    },
+    "ios": {
+      "bundleIdentifier": "com.lab.geotech"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

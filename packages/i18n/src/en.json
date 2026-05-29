@@ -1,0 +1,169 @@
+{
+  "nav": {
+    "projects": "Projects",
+    "boreholes": "Boreholes",
+    "samples": "Samples",
+    "clients": "Clients",
+    "locations": "Locations",
+    "users": "Users",
+    "reports": "Reports",
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "logout": "Logout"
+  },
+  "tests": {
+    "waterContent": "Water Content",
+    "liquidLimit": "Liquid Limit",
+    "plasticLimit": "Plastic Limit",
+    "liquidPlasticLimit": "Atterberg Limits (LL / PL)",
+    "proctor": "Proctor Test",
+    "specificGravity": "Specific Gravity",
+    "particleSize": "Particle Size Analysis",
+    "permeability": "Permeability",
+    "unconfinedCompression": "Unconfined Compression",
+    "directShear": "Direct Shear",
+    "consolidation": "Consolidation",
+    "sidebar": {
+      "bhManager": "BH Manager",
+      "waterContent": "Water Content",
+      "llPl": "LL / PL",
+      "proctor": "Proctor",
+      "specificGravity": "Specific Gravity",
+      "particleSize": "Particle Size",
+      "permeability": "Permeability",
+      "compression": "Compression",
+      "directShear": "Direct Shear",
+      "consolidation": "Consolidation"
+    }
+  },
+  "status": {
+    "project": {
+      "DRAFT": "Draft",
+      "ACTIVE": "Active",
+      "IN_LAB": "In Lab",
+      "ANALYSIS": "In Analysis",
+      "COMPLETED": "Completed",
+      "ARCHIVED": "Archived",
+      "CANCELLED": "Cancelled"
+    },
+    "test": {
+      "PENDING_REVIEW": "Pending Review",
+      "FLAGGED": "Flagged",
+      "APPROVED": "Approved",
+      "REJECTED": "Rejected",
+      "LOCKED": "Locked"
+    },
+    "user": {
+      "PENDING": "Pending",
+      "ACTIVE": "Active",
+      "INACTIVE": "Inactive"
+    }
+  },
+  "roles": {
+    "USER": "Technician",
+    "LAB_MANAGER": "Lab Manager",
+    "ADMIN": "Administrator"
+  },
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "create": "Create",
+    "apply": "Apply",
+    "calculate": "Calculate",
+    "applyAndCalculate": "Apply & Calculate",
+    "generate": "Generate",
+    "download": "Download",
+    "approve": "Approve",
+    "reject": "Reject",
+    "lock": "Lock",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "paste": "Paste"
+  },
+  "units": {
+    "gr": "gr",
+    "kg": "kg",
+    "pct": "%",
+    "mm": "mm",
+    "cm": "cm",
+    "m": "m",
+    "kPa": "kPa",
+    "gCm3": "g/cm³",
+    "kCmS": "cm/s",
+    "degC": "°C",
+    "blows": "blows"
+  },
+  "fields": {
+    "borehole": "Borehole",
+    "sample": "Sample",
+    "projectCode": "Project Code",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "performedBy": "Performed By",
+    "performedAt": "Performed At",
+    "createdAt": "Created At",
+    "updatedAt": "Updated At",
+    "containerLabel": "Container No.",
+    "massContainer": "Mass of Container (g)",
+    "massContainerWet": "Mass Container + Wet Soil (g)",
+    "massContainerDry": "Mass Container + Dry Soil (g)",
+    "massWater": "Mass of Water (g)",
+    "massDrySoil": "Mass of Dry Soil (g)",
+    "waterContentPct": "Water Content (%)",
+    "averageWaterContent": "Average Water Content (%)",
+    "blows": "Number of Blows",
+    "liquidLimit": "Liquid Limit (%)",
+    "plasticLimit": "Plastic Limit (%)",
+    "plasticityIndex": "Plasticity Index (%)",
+    "activity": "Activity",
+    "liquidityIndex": "Liquidity Index",
+    "gs": "Specific Gravity (Gs)",
+    "temperature": "Temperature (°C)",
+    "uscs": "USCS Classification",
+    "aashto": "AASHTO Classification",
+    "qu": "Unconfined Compressive Strength qu (kPa)",
+    "su": "Undrained Shear Strength Su (kPa)",
+    "cohesion": "Cohesion c (kPa)",
+    "frictionAngle": "Friction Angle φ (°)"
+  },
+  "errors": {
+    "required": "This field is required",
+    "mustBePositive": "Value must be positive",
+    "mustBeNumber": "Value must be a number",
+    "waterContentNegative": "Water content cannot be negative",
+    "waterContentHigh": "Water content > 100% is unusual for non-organic soils",
+    "waterContentMax": "Value exceeds physically plausible range",
+    "drySoilMassZero": "Dry soil mass must be positive",
+    "minReadings": "At least {{count}} determination(s) required",
+    "unauthorized": "Unauthorized",
+    "notFound": "Resource not found",
+    "serverError": "Server error. Please try again."
+  },
+  "report": {
+    "generate": "Generate Report",
+    "download": "Download Report",
+    "type": {
+      "testsSummary": "Tests Summary Report",
+      "waterContent": "Water Content Report",
+      "liquidLimit": "Atterberg Limits Report",
+      "proctor": "Proctor Report",
+      "specificGravity": "Specific Gravity Report",
+      "particleSize": "Particle Size Report",
+      "permeability": "Permeability Report",
+      "unconfinedCompression": "Unconfined Compression Report",
+      "directShear": "Direct Shear Report",
+      "consolidation": "Consolidation Report"
+    },
+    "language": {
+      "fr": "Français",
+      "en": "English"
+    }
+  }
+}

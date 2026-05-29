@@ -1,0 +1,66 @@
+name: CI — mobile
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'apps/mobile/**'
+      - 'packages/**'
+      - '.github/workflows/ci-mobile.yml'
+  pull_request:
+    paths:
+      - 'apps/mobile/**'
+      - 'packages/**'
+
+jobs:
+  lint-and-typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Test calcs
+        run: pnpm --filter @geotech/calcs test
+
+      - name: Type-check mobile
+        run: pnpm --filter @geotech/mobile exec tsc --noEmit
+        continue-on-error: true
+
+  eas-build:
+    needs: lint-and-typecheck
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
+
+      - name: Build Android (EAS)
+        working-directory: apps/mobile
+        run: eas build --platform android --profile preview --non-interactive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
