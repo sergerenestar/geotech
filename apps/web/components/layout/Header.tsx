@@ -1,16 +1,34 @@
 'use client';
 
+import { useParams, useRouter } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/lib/auth-context';
-import { useRouter } from 'next/navigation';
+import { apiRequest } from '@/lib/api';
 
-interface HeaderProps {
-  onLanguageChange?: (lang: string) => void;
-  currentLang?: string;
+interface Project {
+  id: string;
+  projectCode: string;
+  name: string;
+  status: string;
 }
 
-export default function Header({ onLanguageChange, currentLang = 'fr' }: HeaderProps) {
+export default function Topbar() {
   const { user, logout } = useAuth();
+  const params = useParams();
   const router = useRouter();
+  const projectId = params?.id as string | undefined;
+
+  const { data: project } = useQuery({
+    queryKey: ['project', projectId],
+    queryFn: () =>
+      apiRequest<{ data: Project }>(`/api/projects/${projectId}`).then(r => r.data),
+    enabled: !!projectId,
+    staleTime: 30000,
+  });
+
+  const initials = user
+    ? `${user.firstName?.[0] ?? ''}${user.lastName?.[0] ?? ''}`.toUpperCase()
+    : '?';
 
   const handleLogout = async () => {
     await logout();
@@ -18,22 +36,90 @@ export default function Header({ onLanguageChange, currentLang = 'fr' }: HeaderP
   };
 
   return (
-    <header className="h-14 bg-brand-gradient flex items-center justify-between px-6 shadow-sm">
-      <span className="text-white font-bold text-lg tracking-tight">GeoTech Lab</span>
-      <div className="flex items-center gap-3">
+    <header style={{
+      height: 44,
+      minHeight: 44,
+      background: '#1c2333',
+      display: 'flex',
+      alignItems: 'center',
+      padding: '0 16px',
+      flexShrink: 0,
+      borderBottom: '1px solid #2e3d52',
+    }}>
+      <span style={{
+        fontSize: 13,
+        fontWeight: 500,
+        color: '#e2e8f0',
+        letterSpacing: '0.04em',
+        paddingRight: 16,
+        borderRight: '1px solid #2e3d52',
+        marginRight: 16,
+        whiteSpace: 'nowrap',
+        flexShrink: 0,
+      }}>
+        GeoTech Lab
+      </span>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, flex: 1, minWidth: 0 }}>
+        {project ? (
+          <>
+            <span style={{ color: '#94a3b8', fontFamily: 'monospace', flexShrink: 0 }}>
+              {project.projectCode}
+            </span>
+            <span style={{ color: '#2e3d52', flexShrink: 0 }}>›</span>
+            <span style={{ color: '#e2e8f0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {project.name}
+            </span>
+            <span style={{
+              fontSize: 9,
+              letterSpacing: '0.1em',
+              padding: '2px 7px',
+              borderRadius: 10,
+              background: '#1e3a5f',
+              color: '#60a5fa',
+              border: '1px solid #2d5a8e',
+              textTransform: 'uppercase',
+              marginLeft: 4,
+              fontWeight: 500,
+              flexShrink: 0,
+            }}>
+              {project.status}
+            </span>
+          </>
+        ) : (
+          <span style={{ color: '#64748b' }}>Projets</span>
+        )}
+      </div>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
         <button
-          onClick={() => onLanguageChange?.(currentLang === 'fr' ? 'en' : 'fr')}
-          className="text-white/80 hover:text-white text-sm font-medium px-2 py-1 rounded"
+          onClick={handleLogout}
+          style={{
+            fontSize: 10,
+            padding: '3px 10px',
+            borderRadius: 4,
+            border: '1px solid #2e3d52',
+            background: 'transparent',
+            color: '#94a3b8',
+            cursor: 'pointer',
+            fontFamily: 'inherit',
+          }}
         >
-          {currentLang === 'fr' ? 'EN' : 'FR'}
+          Déconnexion
         </button>
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white text-sm font-semibold">
-            {user?.firstName?.[0]?.toUpperCase() ?? '?'}
-          </div>
-          <button onClick={handleLogout} className="text-white/70 hover:text-white text-xs">
-            {currentLang === 'fr' ? 'Déconnexion' : 'Logout'}
-          </button>
+        <div style={{
+          width: 28,
+          height: 28,
+          borderRadius: '50%',
+          background: '#2e3d52',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: 11,
+          fontWeight: 600,
+          color: '#e2e8f0',
+        }}>
+          {initials}
         </div>
       </div>
     </header>

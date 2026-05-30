@@ -12,6 +12,7 @@ import java.util.UUID;
 public interface ProjectRepository extends JpaRepository<Project, UUID> {
     Page<Project> findAllByCreatedBy(UUID createdBy, Pageable pageable);
 
-    @Query("SELECT p.projectCode FROM Project p WHERE p.projectCode LIKE :prefix ORDER BY p.projectCode DESC LIMIT 1")
+    // Native query bypasses @Where(is_deleted=false) so soft-deleted codes are never reused
+    @Query(value = "SELECT project_code FROM projects.projects WHERE project_code LIKE :prefix ORDER BY project_code DESC LIMIT 1", nativeQuery = true)
     Optional<String> findLastCodeByPrefix(String prefix);
 }

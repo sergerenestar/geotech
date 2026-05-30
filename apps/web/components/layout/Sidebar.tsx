@@ -1,37 +1,85 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
+import { CSSProperties } from 'react';
 
-export default function Sidebar() {
-  const pathname = usePathname();
-  const { user } = useAuth();
-  const isAdmin = user?.role === 'ADMIN';
+function NavIcon({
+  href,
+  icon,
+  active,
+  title,
+}: {
+  href: string;
+  icon: string;
+  active: boolean;
+  title: string;
+}) {
+  const style: CSSProperties = {
+    width: 36,
+    height: 36,
+    borderRadius: 6,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    background: active ? '#0e7490' : 'transparent',
+    color: active ? '#e0f7fa' : '#4a6080',
+    cursor: 'pointer',
+    transition: 'background 0.15s, color 0.15s',
+  };
 
   return (
-    <aside className="w-56 min-h-full bg-sidebar flex flex-col py-6">
-      <nav className="flex flex-col gap-1 px-3">
-        {[
-          { href: '/projects', label: 'Projets', show: true },
-          { href: '/admin/users', label: 'Utilisateurs', show: isAdmin },
-        ].filter(item => item.show).map(item => {
-          const isActive = pathname.startsWith(item.href);
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                isActive
-                  ? 'text-cyan-400 bg-white/10 border-l-2 border-cyan-400'
-                  : 'text-slate-300 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              {item.label}
-            </Link>
-          );
-        })}
-      </nav>
+    <Link href={href} title={title} style={{ textDecoration: 'none' }}>
+      <div style={style}>
+        <i className={`ti ${icon}`} style={{ fontSize: 18 }} />
+      </div>
+    </Link>
+  );
+}
+
+export default function IconRail() {
+  const pathname = usePathname();
+  const params = useParams();
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
+  const projectId = params?.id as string | undefined;
+
+  const onProjectsRoot = pathname === '/projects';
+  const onAdminPage = pathname.startsWith('/admin');
+
+  return (
+    <aside style={{
+      width: 52,
+      minWidth: 52,
+      background: '#1e2a3a',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      padding: '10px 0',
+      gap: 2,
+      flexShrink: 0,
+      borderRight: '1px solid #161f2e',
+    }}>
+      <NavIcon href="/projects" icon="ti-flask" active={onProjectsRoot} title="Essais" />
+      {projectId && (
+        <NavIcon
+          href={`/projects/${projectId}`}
+          icon="ti-layers-difference"
+          active={!!projectId && !onAdminPage}
+          title="Forages"
+        />
+      )}
+      <NavIcon href="/projects" icon="ti-folder" active={false} title="Projets" />
+
+      <div style={{ width: 24, height: 1, background: '#2e3d52', margin: '4px 0' }} />
+
+      {isAdmin && (
+        <NavIcon href="/admin/users" icon="ti-users" active={onAdminPage} title="Utilisateurs" />
+      )}
+
+      <div style={{ flex: 1 }} />
+      <NavIcon href="/settings" icon="ti-settings" active={pathname === '/settings'} title="Paramètres" />
     </aside>
   );
 }

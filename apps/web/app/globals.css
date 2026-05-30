@@ -1,11 +1,28 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --color-topbar: #1c2333;
+    --color-icon-rail: #1e2a3a;
+    --color-icon-active: #0e7490;
+    --color-accent: #0e7490;
+    --color-accent-hover: #0c6880;
+    --color-panel-bg: #ffffff;
+    --color-page-bg: #f4f5f7;
+    --color-border: #e2e8f0;
+    --color-border-subtle: #f1f5f9;
+    --color-text-primary: #1c2333;
+    --color-text-secondary: #475569;
+    --color-text-muted: #94a3b8;
+  }
+
   body {
-    @apply font-sans bg-background text-gray-900;
+    @apply font-sans text-gray-900;
+    background: var(--color-page-bg);
   }
 }
