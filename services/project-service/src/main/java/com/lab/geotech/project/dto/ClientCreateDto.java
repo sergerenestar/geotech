@@ -4,7 +4,10 @@ import jakarta.validation.constraints.NotBlank;
 
 public record ClientCreateDto(
         @NotBlank String name,
-        String contactPerson,
+        String type,
+        String contactName,
         String email,
-        String phone
+        String phone,
+        String address,
+        String notes
 ) {}

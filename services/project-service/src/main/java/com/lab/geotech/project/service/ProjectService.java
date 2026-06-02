@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.OffsetDateTime;
 import java.util.Set;
 import java.util.UUID;
 
@@ -62,6 +63,22 @@ public class ProjectService {
         );
     }
 
+    public PagedResponse<ProjectResponse> getProjectsForLabManager(UUID labManagerId, int page, int size) {
+        Page<Project> projects = projectRepository.findAllByLabManagerId(labManagerId, PageRequest.of(page, size));
+        return PagedResponse.of(
+                projects.getContent().stream().map(ProjectResponse::from).toList(),
+                projects.getTotalElements(), page, size
+        );
+    }
+
+    public PagedResponse<ProjectResponse> getProjectsForTechnician(UUID technicianId, int page, int size) {
+        Page<Project> projects = projectRepository.findAllByTechnicianId(technicianId, PageRequest.of(page, size));
+        return PagedResponse.of(
+                projects.getContent().stream().map(ProjectResponse::from).toList(),
+                projects.getTotalElements(), page, size
+        );
+    }
+
     public PagedResponse<ProjectResponse> getAllProjects(int page, int size) {
         Page<Project> projects = projectRepository.findAll(PageRequest.of(page, size));
         return PagedResponse.of(
@@ -85,6 +102,22 @@ public class ProjectService {
             throw new InvalidStatusTransitionException(project.getStatus(), newStatus);
         }
         project.setStatus(newStatus);
+        return ProjectResponse.from(projectRepository.save(project));
+    }
+
+    public PagedResponse<ProjectResponse> getProjectsByClientId(UUID clientId, int page, int size) {
+        Page<Project> projects = projectRepository.findAllByClientId(clientId, PageRequest.of(page, size));
+        return PagedResponse.of(
+                projects.getContent().stream().map(ProjectResponse::from).toList(),
+                projects.getTotalElements(), page, size);
+    }
+
+    @Transactional
+    public ProjectResponse acceptProject(UUID projectId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException(projectId));
+        project.setClientAccepted(true);
+        project.setClientAcceptedAt(OffsetDateTime.now());
         return ProjectResponse.from(projectRepository.save(project));
     }
 

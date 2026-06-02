@@ -1,6 +1,7 @@
 package com.lab.geotech.project.service;
 
 import com.lab.geotech.project.constant.TestType;
+import com.lab.geotech.project.dto.ProjectTestAssignDto;
 import com.lab.geotech.project.dto.ProjectTestResponse;
 import com.lab.geotech.project.dto.ProjectTestSetDto;
 import com.lab.geotech.project.entity.ProjectTest;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -49,6 +51,18 @@ public class ProjectTestService {
         repo.findByProjectIdAndTestType(projectId, type)
                 .orElseThrow(() -> new RuntimeException("Test type " + type + " not found in project catalogue"));
         repo.deleteByProjectIdAndTestType(projectId, type);
+    }
+
+    @Transactional
+    public ProjectTestResponse assignTechnician(UUID projectId, UUID testId, ProjectTestAssignDto dto) {
+        ProjectTest pt = repo.findById(testId)
+                .filter(t -> t.getProjectId().equals(projectId))
+                .orElseThrow(() -> new RuntimeException("Test not found in project"));
+        pt.setTechnicianId(dto.technicianId());
+        pt.setPriority(dto.priority());
+        pt.setDeadline(dto.deadline() != null && !dto.deadline().isBlank()
+                ? LocalDate.parse(dto.deadline()) : null);
+        return ProjectTestResponse.from(repo.save(pt));
     }
 
     @Transactional

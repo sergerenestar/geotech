@@ -15,12 +15,15 @@ public record ProjectResponse(
         UUID clientId,
         UUID locationId,
         UUID createdBy,
+        boolean clientAccepted,
+        OffsetDateTime clientAcceptedAt,
         OffsetDateTime createdAt,
         OffsetDateTime updatedAt
 ) {
     public static ProjectResponse from(Project p) {
         return new ProjectResponse(p.getId(), p.getProjectCode(), p.getName(), p.getDescription(),
                 p.getStatus(), p.getClientId(), p.getLocationId(), p.getCreatedBy(),
+                p.isClientAccepted(), p.getClientAcceptedAt(),
                 p.getCreatedAt(), p.getUpdatedAt());
     }
 }

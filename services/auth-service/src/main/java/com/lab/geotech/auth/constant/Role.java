@@ -4,5 +4,7 @@ public enum Role {
     USER,
     LAB_MANAGER,
     ADMIN,
-    PROJECT_MANAGER
+    PROJECT_MANAGER,
+    TECHNICIAN,
+    CLIENT
 }

@@ -43,6 +43,24 @@ export function useAdminUsers(filter: RoleFilter = 'ALL') {
   });
 }
 
+export function useLabManagers() {
+  return useQuery<AdminUser[]>({
+    queryKey: ['lab-managers'],
+    queryFn: () =>
+      apiRequest<{ data: { data: AdminUser[] } }>('/api/auth/users/lab-managers')
+        .then(r => r.data.data),
+  });
+}
+
+export function useTechnicians() {
+  return useQuery<AdminUser[]>({
+    queryKey: ['technicians'],
+    queryFn: () =>
+      apiRequest<{ data: { data: AdminUser[] } }>('/api/auth/users/technicians')
+        .then(r => r.data.data),
+  });
+}
+
 export function useAdminUser(id: string) {
   return useQuery<AdminUser>({
     queryKey: ['admin-user', id],

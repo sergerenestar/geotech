@@ -53,6 +53,9 @@ public class User {
     @Column(nullable = false, length = 5)
     private String language;
 
+    @Column(name = "client_id")
+    private UUID clientId;
+
     @Column(name = "is_deleted", nullable = false)
     @Builder.Default
     private boolean deleted = false;

@@ -10,6 +10,7 @@ interface AuthUser {
   lastName: string;
   role: string;
   language: string;
+  clientId?: string;
 }
 
 interface AuthContextValue {

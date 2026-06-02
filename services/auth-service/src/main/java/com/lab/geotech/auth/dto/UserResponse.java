@@ -16,6 +16,7 @@ public record UserResponse(
         Role role,
         UserStatus status,
         String language,
+        UUID clientId,
         OffsetDateTime createdAt
 ) {
     public static UserResponse from(User user) {
@@ -28,6 +29,7 @@ public record UserResponse(
                 user.getRole(),
                 user.getStatus(),
                 user.getLanguage(),
+                user.getClientId(),
                 user.getCreatedAt()
         );
     }

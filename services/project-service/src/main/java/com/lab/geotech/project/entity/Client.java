@@ -26,8 +26,11 @@ public class Client {
     @Column(nullable = false, length = 200)
     private String name;
 
-    @Column(name = "contact_person", length = 200)
-    private String contactPerson;
+    @Column(nullable = false, length = 20)
+    private String type;
+
+    @Column(name = "contact_name", length = 200)
+    private String contactName;
 
     @Column(length = 200)
     private String email;
@@ -35,8 +38,18 @@ public class Client {
     @Column(length = 50)
     private String phone;
 
+    @Column(columnDefinition = "TEXT")
+    private String address;
+
+    @Column(columnDefinition = "TEXT")
+    private String notes;
+
+    @Column(name = "created_by")
+    private UUID createdBy;
+
     @Column(name = "is_deleted", nullable = false)
-    private boolean deleted;
+    @Builder.Default
+    private boolean deleted = false;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

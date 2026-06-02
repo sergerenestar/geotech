@@ -9,10 +9,11 @@ interface ProjectCardProps {
   name: string;
   status: string;
   createdAt: string;
+  clientName?: string;
   onDelete?: () => void;
 }
 
-export default function ProjectCard({ id, projectCode, name, status, createdAt, onDelete }: ProjectCardProps) {
+export default function ProjectCard({ id, projectCode, name, status, createdAt, clientName, onDelete }: ProjectCardProps) {
   return (
     <Link href={`/projects/${id}`}>
       <div className="bg-surface rounded-card shadow-card p-5 hover:shadow-md transition-shadow cursor-pointer">
@@ -20,8 +21,11 @@ export default function ProjectCard({ id, projectCode, name, status, createdAt, 
           <span className="text-xs font-mono text-gray-500">{projectCode}</span>
           <Badge status={status} />
         </div>
-        <h3 className="font-semibold text-gray-900 text-sm leading-snug mb-3">{name}</h3>
-        <div className="flex items-center justify-between">
+        <h3 className="font-semibold text-gray-900 text-sm leading-snug mb-1">{name}</h3>
+        {clientName && (
+          <p className="text-xs text-brand-blue mb-2 truncate">{clientName}</p>
+        )}
+        <div className="flex items-center justify-between mt-2">
           <p className="text-xs text-gray-400">
             {new Date(createdAt).toLocaleDateString('fr-FR', { year: 'numeric', month: 'short', day: 'numeric' })}
           </p>

@@ -6,6 +6,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -32,6 +33,15 @@ public class ProjectTest {
 
     @Column(name = "lab_manager_id")
     private UUID labManagerId;
+
+    @Column(name = "technician_id")
+    private UUID technicianId;
+
+    @Column(name = "priority", length = 20)
+    private String priority;
+
+    @Column(name = "deadline")
+    private LocalDate deadline;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

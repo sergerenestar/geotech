@@ -1,6 +1,7 @@
 package com.lab.geotech.auth.controller;
 
 import com.lab.geotech.auth.dto.AdminNoteResponse;
+import com.lab.geotech.auth.dto.CreateClientUserRequest;
 import com.lab.geotech.auth.dto.CreateUserRequest;
 import com.lab.geotech.auth.dto.NoteRequest;
 import com.lab.geotech.auth.dto.PagedResponse;
@@ -36,6 +37,33 @@ public class UserController {
             @RequestParam(required = false) String status) {
         return ResponseEntity.ok(ApiResponse.success(
                 userService.getAllUsers(page, size, role, status), "OK"));
+    }
+
+    @GetMapping("/lab-managers")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PROJECT_MANAGER', 'LAB_MANAGER')")
+    public ResponseEntity<ApiResponse<PagedResponse<UserResponse>>> getLabManagers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "100") int size) {
+        return ResponseEntity.ok(ApiResponse.success(
+                userService.getAllUsers(page, size, "LAB_MANAGER", null), "OK"));
+    }
+
+    @GetMapping("/technicians")
+    @PreAuthorize("hasAnyRole('ADMIN', 'LAB_MANAGER')")
+    public ResponseEntity<ApiResponse<PagedResponse<UserResponse>>> getTechnicians(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "100") int size) {
+        return ResponseEntity.ok(ApiResponse.success(
+                userService.getAllUsers(page, size, "TECHNICIAN", null), "OK"));
+    }
+
+    @PostMapping("/client")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PROJECT_MANAGER')")
+    public ResponseEntity<ApiResponse<UserResponse>> createClientUser(
+            @Valid @RequestBody CreateClientUserRequest req,
+            @AuthenticationPrincipal String adminId) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(
+                userService.createClientUser(req, UUID.fromString(adminId)), "Client user created"));
     }
 
     @PostMapping

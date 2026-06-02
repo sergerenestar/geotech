@@ -8,9 +8,10 @@ import { useCreateProject } from '@/hooks/useProjects';
 interface CreateProjectModalProps {
   onClose: () => void;
   onCreated: () => void;
+  clientId?: string;
 }
 
-export default function CreateProjectModal({ onClose, onCreated }: CreateProjectModalProps) {
+export default function CreateProjectModal({ onClose, onCreated, clientId }: CreateProjectModalProps) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [error, setError] = useState('');
@@ -20,7 +21,7 @@ export default function CreateProjectModal({ onClose, onCreated }: CreateProject
     e.preventDefault();
     setError('');
     try {
-      await createProject.mutateAsync({ name, description });
+      await createProject.mutateAsync({ name, description, clientId });
       onCreated();
       onClose();
     } catch (err: unknown) {

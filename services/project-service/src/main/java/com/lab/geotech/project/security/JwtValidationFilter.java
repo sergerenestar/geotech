@@ -49,11 +49,15 @@ public class JwtValidationFilter extends OncePerRequestFilter {
                     .getPayload();
 
             String role = claims.get("role", String.class);
+            String clientIdStr = claims.get("clientId", String.class);
             var auth = new UsernamePasswordAuthenticationToken(
                     claims.getSubject(),
                     null,
                     List.of(new SimpleGrantedAuthority("ROLE_" + role))
             );
+            if (clientIdStr != null) {
+                auth.setDetails(java.util.Map.of("clientId", clientIdStr));
+            }
             SecurityContextHolder.getContext().setAuthentication(auth);
         } catch (JwtException ex) {
             log.debug("Invalid JWT token: {}", ex.getMessage());

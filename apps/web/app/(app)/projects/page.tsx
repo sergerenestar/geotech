@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/auth-context';
 import { apiRequest } from '@/lib/api';
+import { useClients } from '@/hooks/useClients';
 import ProjectCard from '@/components/projects/ProjectCard';
 import Button from '@/components/ui/Button';
 import CreateProjectModal from '@/components/projects/CreateProjectModal';
@@ -13,6 +14,7 @@ interface Project {
   projectCode: string;
   name: string;
   status: string;
+  clientId?: string;
   createdAt: string;
 }
 
@@ -24,6 +26,8 @@ export default function ProjectsPage() {
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   const canDelete = user?.role === 'ADMIN' || user?.role === 'PROJECT_MANAGER';
+  const canSeeClients = user?.role === 'ADMIN' || user?.role === 'PROJECT_MANAGER' || user?.role === 'LAB_MANAGER';
+  const { data: clients = [] } = useClients();
 
   const { data, isLoading } = useQuery({
     queryKey: ['projects'],
@@ -76,6 +80,7 @@ export default function ProjectsPage() {
             <ProjectCard
               key={p.id}
               {...p}
+              clientName={canSeeClients && p.clientId ? clients.find(c => c.id === p.clientId)?.name : undefined}
               onDelete={canDelete ? () => setConfirmDeleteId(p.id) : undefined}
             />
           ))}

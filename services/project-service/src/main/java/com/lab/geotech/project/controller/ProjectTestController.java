@@ -1,5 +1,6 @@
 package com.lab.geotech.project.controller;
 
+import com.lab.geotech.project.dto.ProjectTestAssignDto;
 import com.lab.geotech.project.dto.ProjectTestResponse;
 import com.lab.geotech.project.dto.ProjectTestSetDto;
 import com.lab.geotech.project.exception.ApiResponse;
@@ -31,6 +32,15 @@ public class ProjectTestController {
             @PathVariable UUID projectId,
             @Valid @RequestBody ProjectTestSetDto dto) {
         return ResponseEntity.ok(ApiResponse.success(service.setProjectTests(projectId, dto), "Catalogue saved"));
+    }
+
+    @PatchMapping("/{testId}/assign")
+    public ResponseEntity<ApiResponse<ProjectTestResponse>> assign(
+            @PathVariable UUID projectId,
+            @PathVariable UUID testId,
+            @RequestBody ProjectTestAssignDto dto) {
+        return ResponseEntity.ok(ApiResponse.success(
+                service.assignTechnician(projectId, testId, dto), "Assigned"));
     }
 
     @DeleteMapping("/{testType}")

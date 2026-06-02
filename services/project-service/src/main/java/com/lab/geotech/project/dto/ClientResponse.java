@@ -8,12 +8,18 @@ import java.util.UUID;
 public record ClientResponse(
         UUID id,
         String name,
-        String contactPerson,
+        String type,
+        String contactName,
         String email,
         String phone,
+        String address,
+        String notes,
+        long projectCount,
         OffsetDateTime createdAt
 ) {
-    public static ClientResponse from(Client c) {
-        return new ClientResponse(c.getId(), c.getName(), c.getContactPerson(), c.getEmail(), c.getPhone(), c.getCreatedAt());
+    public static ClientResponse from(Client c, long projectCount) {
+        return new ClientResponse(c.getId(), c.getName(), c.getType(), c.getContactName(),
+                c.getEmail(), c.getPhone(), c.getAddress(), c.getNotes(),
+                projectCount, c.getCreatedAt());
     }
 }

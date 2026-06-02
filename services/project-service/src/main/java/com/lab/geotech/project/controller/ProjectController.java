@@ -11,9 +11,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -26,10 +29,32 @@ public class ProjectController {
     @GetMapping("/mine")
     public ResponseEntity<ApiResponse<PagedResponse<ProjectResponse>>> getMyProjects(
             @AuthenticationPrincipal String userId,
+            Authentication authentication,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        return ResponseEntity.ok(ApiResponse.success(
-                projectService.getMyProjects(UUID.fromString(userId), page, size), "OK"));
+        UUID uid = UUID.fromString(userId);
+        boolean isLabManager  = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_LAB_MANAGER"));
+        boolean isTechnician  = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_TECHNICIAN")
+                            || a.getAuthority().equals("ROLE_USER"));
+        boolean isClient = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_CLIENT"));
+        PagedResponse<ProjectResponse> result;
+        if (isLabManager) {
+            result = projectService.getProjectsForLabManager(uid, page, size);
+        } else if (isTechnician) {
+            result = projectService.getProjectsForTechnician(uid, page, size);
+        } else if (isClient) {
+            Object details = authentication.getDetails();
+            String clientIdStr = details instanceof Map
+                    ? ((Map<?, ?>) details).get("clientId").toString() : null;
+            if (clientIdStr == null) return ResponseEntity.ok(ApiResponse.success(PagedResponse.of(List.of(), 0L, page, size), "OK"));
+            result = projectService.getProjectsByClientId(UUID.fromString(clientIdStr), page, size);
+        } else {
+            result = projectService.getMyProjects(uid, page, size);
+        }
+        return ResponseEntity.ok(ApiResponse.success(result, "OK"));
     }
 
     @GetMapping
@@ -60,6 +85,12 @@ public class ProjectController {
             @Valid @RequestBody ProjectStatusUpdateDto dto) {
         return ResponseEntity.ok(ApiResponse.success(
                 projectService.updateStatus(id, dto.status()), "Status updated"));
+    }
+
+    @PatchMapping("/{id}/accept")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<ApiResponse<ProjectResponse>> accept(@PathVariable UUID id) {
+        return ResponseEntity.ok(ApiResponse.success(projectService.acceptProject(id), "Project accepted"));
     }
 
     @DeleteMapping("/{id}")

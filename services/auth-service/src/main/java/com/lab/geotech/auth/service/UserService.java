@@ -3,6 +3,7 @@ package com.lab.geotech.auth.service;
 import com.lab.geotech.auth.constant.Role;
 import com.lab.geotech.auth.constant.UserStatus;
 import com.lab.geotech.auth.dto.AdminNoteResponse;
+import com.lab.geotech.auth.dto.CreateClientUserRequest;
 import com.lab.geotech.auth.dto.CreateUserRequest;
 import com.lab.geotech.auth.dto.NoteRequest;
 import com.lab.geotech.auth.dto.PagedResponse;
@@ -77,6 +78,27 @@ public class UserService {
         auditService.log(adminId, "USER_CREATED_BY_ADMIN", "USER", saved.id().toString(),
                 Map.of("createdBy", adminId.toString(), "role", req.role().name()), null);
         return saved;
+    }
+
+    @Transactional
+    public UserResponse createClientUser(CreateClientUserRequest req, UUID createdBy) {
+        if (userRepository.existsByEmail(req.email())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already registered");
+        }
+        User user = User.builder()
+                .email(req.email())
+                .passwordHash(passwordEncoder.encode(req.password()))
+                .firstName(req.firstName())
+                .lastName(req.lastName())
+                .role(com.lab.geotech.auth.constant.Role.CLIENT)
+                .status(com.lab.geotech.auth.constant.UserStatus.ACTIVE)
+                .language("fr")
+                .clientId(req.clientId())
+                .build();
+        User saved = userRepository.save(user);
+        auditService.log(createdBy, "CREATE_CLIENT_USER", "User", saved.getId().toString(),
+                Map.of("email", saved.getEmail(), "clientId", req.clientId().toString()), null);
+        return UserResponse.from(saved);
     }
 
     @Transactional

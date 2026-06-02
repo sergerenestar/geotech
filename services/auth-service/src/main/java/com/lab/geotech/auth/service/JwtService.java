@@ -30,10 +30,14 @@ public class JwtService {
 
     public String generateAccessToken(User user) {
         Instant now = Instant.now();
-        return Jwts.builder()
+        var builder = Jwts.builder()
                 .subject(user.getId().toString())
                 .claim("email", user.getEmail())
-                .claim("role", user.getRole().name())
+                .claim("role", user.getRole().name());
+        if (user.getClientId() != null) {
+            builder = builder.claim("clientId", user.getClientId().toString());
+        }
+        return builder
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plusMillis(accessExpirationMs)))
                 .signWith(signingKey)

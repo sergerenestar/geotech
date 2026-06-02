@@ -43,6 +43,7 @@ export default function IconRail() {
   const params = useParams();
   const { user } = useAuth();
   const isAdmin = user?.role === 'ADMIN';
+  const isPmOrAdmin = user?.role === 'ADMIN' || user?.role === 'PROJECT_MANAGER';
   const projectId = params?.id as string | undefined;
 
   const onProjectsRoot = pathname === '/projects';
@@ -62,6 +63,9 @@ export default function IconRail() {
       borderRight: '1px solid #161f2e',
     }}>
       <NavIcon href="/projects" icon="ti-flask" active={onProjectsRoot} title="Essais" />
+      {isPmOrAdmin && (
+        <NavIcon href="/clients" icon="ti-building" active={pathname.startsWith('/clients')} title="Clients" />
+      )}
       {projectId && (
         <NavIcon
           href={`/projects/${projectId}`}

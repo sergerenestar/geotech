@@ -40,6 +40,13 @@ public class Project {
     @Column(name = "client_id")
     private UUID clientId;
 
+    @Column(name = "client_accepted", nullable = false)
+    @Builder.Default
+    private boolean clientAccepted = false;
+
+    @Column(name = "client_accepted_at")
+    private OffsetDateTime clientAcceptedAt;
+
     @Column(name = "location_id")
     private UUID locationId;
 
