@@ -20,6 +20,19 @@ import java.time.OffsetDateTime;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * Business logic for the Project aggregate root.
+ *
+ * <p>Key responsibilities:
+ * <ul>
+ *   <li>Create projects with auto-generated {@code GT-YYYY-NNNN} codes.</li>
+ *   <li>Return role-scoped project lists: PM sees own projects, LM sees projects
+ *       that have at least one test assigned to them, technicians see projects
+ *       with at least one test assigned to them.</li>
+ *   <li>Enforce the project status state machine via {@code VALID_TRANSITIONS}.</li>
+ *   <li>Cascade soft-delete to boreholes and samples (FK-equivalent cleanup).</li>
+ * </ul>
+ */
 @Service
 @RequiredArgsConstructor
 public class ProjectService {
@@ -29,6 +42,21 @@ public class ProjectService {
     private final BoreholeRepository boreholeRepository;
     private final SampleRepository sampleRepository;
 
+    /**
+     * Project lifecycle state machine.
+     *
+     * <pre>
+     *   DRAFT → ACTIVE | CANCELLED
+     *   ACTIVE → ON_HOLD | PENDING_REVIEW | CANCELLED
+     *   ON_HOLD → ACTIVE | CANCELLED
+     *   PENDING_REVIEW → COMPLETED | ACTIVE
+     *   COMPLETED → ARCHIVED
+     *   ARCHIVED → (terminal)
+     *   CANCELLED → (terminal)
+     * </pre>
+     *
+     * Any attempt to transition outside these edges throws {@link InvalidStatusTransitionException}.
+     */
     private static final java.util.Map<ProjectStatus, Set<ProjectStatus>> VALID_TRANSITIONS = java.util.Map.of(
             ProjectStatus.DRAFT,          Set.of(ProjectStatus.ACTIVE, ProjectStatus.CANCELLED),
             ProjectStatus.ACTIVE,         Set.of(ProjectStatus.ON_HOLD, ProjectStatus.PENDING_REVIEW, ProjectStatus.CANCELLED),

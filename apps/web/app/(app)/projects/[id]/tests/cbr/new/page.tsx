@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { useCreateCbrTest, CbrIntensityInput, SwellingInput, PenetrationInput } from '@/hooks/useCbrTests';
+import { useSgTestsByProject } from '@/hooks/useSgTests';
 
 const BLOW_LEVELS = [55, 25, 10] as const;
 const SWELLING_HOURS = [0, 24, 48, 72, 96];
@@ -33,9 +34,22 @@ export default function NewCbrTestPage() {
   const { id: projectId } = useParams<{ id: string }>();
   const router = useRouter();
   const createTest = useCreateCbrTest();
+  const { data: sgTests = [] } = useSgTestsByProject(projectId as string);
+  const [gsPrefilled, setGsPrefilled] = useState(false);
 
   const [reference, setReference] = useState('');
+  const [moldVolumeCm3, setMoldVolumeCm3] = useState('2332');
   const [specificGravity, setSpecificGravity] = useState('2.657');
+
+  useEffect(() => {
+    if (!gsPrefilled && sgTests.length > 0) {
+      const latest = sgTests.find(t => t.gsAverage != null) ?? sgTests[0];
+      if (latest?.gsAverage != null) {
+        setSpecificGravity(String(latest.gsAverage.toFixed(4)));
+        setGsPrefilled(true);
+      }
+    }
+  }, [sgTests, gsPrefilled]);
   const [proctorGdmax, setProctorGdmax] = useState('');
   const [proctorOmc, setProctorOmc] = useState('');
   const [ringCoeff, setRingCoeff] = useState('0.318');
@@ -80,7 +94,7 @@ export default function NewCbrTestPage() {
   function calcDryDensity(intensity: IntensityState): number | null {
     const mold = parseFloat(intensity.massMoldG);
     const dry = parseFloat(intensity.massDryG);
-    const moldVol = 2332; // cm³ — standard CBR mold NF P94-078
+    const moldVol = parseFloat(moldVolumeCm3) || 2332;
     if (isNaN(mold) || isNaN(dry) || dry <= mold) return null;
     return (dry - mold) / moldVol;
   }
@@ -90,7 +104,7 @@ export default function NewCbrTestPage() {
     setError('');
 
     const gs = parseFloat(specificGravity);
-    if (isNaN(gs) || gs <= 0) { setError('La densité relative Gs est requise.'); return; }
+    if (isNaN(gs) || gs <= 0) { setError('Le poids spécifique Gs est requis.'); return; }
 
     const intensityPayload: CbrIntensityInput[] = BLOW_LEVELS.map(blows => {
       const intensity = intensities[blows];
@@ -122,6 +136,7 @@ export default function NewCbrTestPage() {
         projectId,
         reference: reference || undefined,
         specificGravity: gs,
+        moldVolumeCm3: parseFloat(moldVolumeCm3) || 2332,
         proctorGdmaxTm3: parseFloat(proctorGdmax) || undefined,
         proctorOmcPct: parseFloat(proctorOmc) || undefined,
         ringCoefficient: parseFloat(ringCoeff) || 0.318,
@@ -150,7 +165,8 @@ export default function NewCbrTestPage() {
           <h2 className="text-lg font-semibold text-gray-800">Informations générales</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <Input label="Référence" value={reference} onChange={e => setReference(e.target.value)} placeholder="GNT-IC-2026" />
-            <Input label="Densité relative Gs" type="number" step="0.001" required value={specificGravity} onChange={e => setSpecificGravity(e.target.value)} />
+            <Input label="Volume moule (cm³)" type="number" step="0.01" required value={moldVolumeCm3} onChange={e => setMoldVolumeCm3(e.target.value)} placeholder="2332" />
+            <Input label="Poids Spécifique (Gs)" type="number" step="0.001" required value={specificGravity} onChange={e => setSpecificGravity(e.target.value)} />
             <Input label="Coefficient anneau (kN/div)" type="number" step="0.0001" value={ringCoeff} onChange={e => setRingCoeff(e.target.value)} placeholder="0.318" />
             <Input label="DSM Proctor réf. (T/m³)" type="number" step="0.001" value={proctorGdmax} onChange={e => setProctorGdmax(e.target.value)} placeholder="1.637" />
             <Input label="OPM Proctor réf. (%)" type="number" step="0.1" value={proctorOmc} onChange={e => setProctorOmc(e.target.value)} placeholder="20.4" />

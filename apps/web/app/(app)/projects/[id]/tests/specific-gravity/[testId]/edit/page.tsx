@@ -73,7 +73,7 @@ export default function EditSgTestPage() {
     if (determinations.length < 2) { setError('Au moins 2 déterminations sont requises.'); return; }
     try {
       await updateTest.mutateAsync({ testId, payload: { projectId, notes: notes || undefined, determinations } });
-      router.push(`/projects/${projectId}/tests/specific-gravity/${testId}`);
+      router.push(`/projects/${projectId}`);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Erreur lors de la mise à jour.');
     }

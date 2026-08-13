@@ -13,8 +13,12 @@ public record PsTestCreateDto(
         UUID projectId,
         UUID boreholeId,
         @NotNull String testType,
-        @NotNull @Positive BigDecimal totalDryMassG,
+        BigDecimal sampleMassG,
+        BigDecimal waterContentPct,
+        BigDecimal totalDryMassG,
         BigDecimal specificGravity,
+        String materialType,
+        String applicableNorm,
         String notes,
         @Valid List<SieveResultInputDto> sieveResults,
         @Valid List<HydrometerReadingInputDto> hydrometerReadings

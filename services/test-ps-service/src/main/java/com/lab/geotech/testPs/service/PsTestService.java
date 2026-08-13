@@ -53,6 +53,7 @@ public class PsTestService {
         PsTestType testType = PsTestType.valueOf(dto.testType().toUpperCase());
         BigDecimal specificGravity = dto.specificGravity() != null
                 ? dto.specificGravity() : DEFAULT_SPECIFIC_GRAVITY;
+        BigDecimal totalDryMassG = resolveTotalDryMass(dto);
 
         // Build entity
         PsTest test = PsTest.builder()
@@ -62,15 +63,19 @@ public class PsTestService {
                 .technicianId(technicianId)
                 .status(DRAFT)
                 .testType(testType)
-                .totalDryMassG(dto.totalDryMassG())
+                .sampleMassG(dto.sampleMassG())
+                .waterContentPct(dto.waterContentPct())
+                .totalDryMassG(totalDryMassG)
                 .specificGravity(specificGravity)
+                .materialType(dto.materialType())
+                .applicableNorm(dto.applicableNorm())
                 .notes(dto.notes())
                 .aiFlag(AiFlag.NONE)
                 .build();
 
         // Calculate sieve results
         List<PsSieveResult> sieveResults = calculationService.calculateSieveResults(
-                dto.sieveResults(), dto.totalDryMassG());
+                dto.sieveResults(), totalDryMassG);
         for (PsSieveResult r : sieveResults) {
             r.setPsTest(test);
             test.getSieveResults().add(r);
@@ -78,7 +83,7 @@ public class PsTestService {
 
         // Calculate hydrometer readings
         List<PsHydrometerReading> hydroReadings = calculationService.calculateHydrometerReadings(
-                dto.hydrometerReadings(), dto.totalDryMassG(), specificGravity);
+                dto.hydrometerReadings(), totalDryMassG, specificGravity);
         for (PsHydrometerReading r : hydroReadings) {
             r.setPsTest(test);
             test.getHydrometerReadings().add(r);
@@ -166,10 +171,11 @@ public class PsTestService {
         PsTestType testType = PsTestType.valueOf(dto.testType().toUpperCase());
         BigDecimal specificGravity = dto.specificGravity() != null
                 ? dto.specificGravity() : DEFAULT_SPECIFIC_GRAVITY;
+        BigDecimal totalDryMassG = resolveTotalDryMass(dto);
 
         test.getSieveResults().clear();
         List<PsSieveResult> sieveResults = calculationService.calculateSieveResults(
-                dto.sieveResults(), dto.totalDryMassG());
+                dto.sieveResults(), totalDryMassG);
         for (PsSieveResult r : sieveResults) {
             r.setPsTest(test);
             test.getSieveResults().add(r);
@@ -177,15 +183,19 @@ public class PsTestService {
 
         test.getHydrometerReadings().clear();
         List<PsHydrometerReading> hydroReadings = calculationService.calculateHydrometerReadings(
-                dto.hydrometerReadings(), dto.totalDryMassG(), specificGravity);
+                dto.hydrometerReadings(), totalDryMassG, specificGravity);
         for (PsHydrometerReading r : hydroReadings) {
             r.setPsTest(test);
             test.getHydrometerReadings().add(r);
         }
 
         test.setTestType(testType);
-        test.setTotalDryMassG(dto.totalDryMassG());
+        test.setSampleMassG(dto.sampleMassG());
+        test.setWaterContentPct(dto.waterContentPct());
+        test.setTotalDryMassG(totalDryMassG);
         test.setSpecificGravity(specificGravity);
+        test.setMaterialType(dto.materialType());
+        test.setApplicableNorm(dto.applicableNorm());
         test.setNotes(dto.notes());
 
         PsCalculationService.PsFractions fractions = calculationService.calculateFractions(sieveResults);
@@ -210,12 +220,25 @@ public class PsTestService {
         test.setUscsName(uscs.name());
 
         PsAnomalyService.AnomalyResult anomaly = anomalyService.analyze(
-                sieveResults, hydroReadings, dto.totalDryMassG(), testType);
+                sieveResults, hydroReadings, totalDryMassG, testType);
         anomaly = anomalyService.checkCoefficients(diameters.cc(), anomaly);
         test.setAiFlag(anomaly.flag());
         test.setAiFlagMessage(anomaly.message());
 
         return PsTestResponse.from(repository.save(test));
+    }
+
+    private BigDecimal resolveTotalDryMass(PsTestCreateDto dto) {
+        if (dto.sampleMassG() != null && dto.waterContentPct() != null) {
+            BigDecimal divisor = BigDecimal.ONE.add(
+                    dto.waterContentPct().divide(new BigDecimal("100"), 10, java.math.RoundingMode.HALF_UP));
+            return dto.sampleMassG().divide(divisor, 3, java.math.RoundingMode.HALF_UP);
+        }
+        if (dto.totalDryMassG() == null) {
+            throw new IllegalArgumentException(
+                    "Either sampleMassG + waterContentPct or totalDryMassG must be provided");
+        }
+        return dto.totalDryMassG();
     }
 
     private PsTest findOrThrow(UUID id) {

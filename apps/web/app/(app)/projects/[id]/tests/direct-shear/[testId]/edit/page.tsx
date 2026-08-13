@@ -93,7 +93,7 @@ export default function EditDsTestPage() {
           })),
         },
       });
-      router.push(`/projects/${projectId}/tests/direct-shear/${testId}`);
+      router.push(`/projects/${projectId}`);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Erreur lors de la mise à jour.');
     }

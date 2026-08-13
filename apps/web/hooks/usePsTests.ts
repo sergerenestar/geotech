@@ -21,8 +21,12 @@ export interface PsCreatePayload {
   projectId?: string;
   boreholeId?: string;
   testType?: 'SIEVE' | 'HYDROMETER' | 'COMBINED';
+  sampleMassG?: number;
+  waterContentPct?: number;
   totalDryMassG: number;
   specificGravity?: number;
+  materialType?: string;
+  applicableNorm?: string;
   notes?: string;
   sieveResults: SieveResultInput[];
   hydrometerReadings?: HydrometerReadingInput[];
@@ -56,8 +60,12 @@ export interface PsTest {
   technicianId: string;
   status: string;
   testType: string;
+  sampleMassG?: number;
+  waterContentPct?: number;
   totalDryMassG: number;
   specificGravity: number;
+  materialType?: string;
+  applicableNorm?: string;
   pctGravel?: number;
   pctSand?: number;
   pctFines?: number;

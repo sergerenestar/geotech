@@ -21,6 +21,25 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+/**
+ * Servlet filter that validates incoming JWT Bearer tokens and populates the Spring Security context.
+ *
+ * <p>JWT validation is intentionally done inside each microservice rather than at the Nginx gateway.
+ * This means that even if a request reaches the service directly (bypassing Nginx), it cannot
+ * authenticate without a valid token signed with the shared HMAC-SHA key.
+ *
+ * <p>Token parsing:
+ * <ul>
+ *   <li>{@code sub} (subject) = the user's UUID — becomes {@code Authentication.getName()}.</li>
+ *   <li>{@code role} custom claim = e.g. "ADMIN" → stored as {@code ROLE_ADMIN} authority.</li>
+ *   <li>{@code clientId} custom claim (optional) = only present on CLIENT-role tokens;
+ *       stored in {@code auth.details} so the controller can scope project queries to the client.</li>
+ * </ul>
+ *
+ * <p>On an invalid or expired token the request is allowed to continue unauthenticated (no 401
+ * is thrown here). Endpoint-level {@code @PreAuthorize} or {@code SecurityConfig} rules then
+ * reject the request if authentication is required.
+ */
 @Slf4j
 @Component
 public class JwtValidationFilter extends OncePerRequestFilter {
@@ -60,6 +79,8 @@ public class JwtValidationFilter extends OncePerRequestFilter {
             }
             SecurityContextHolder.getContext().setAuthentication(auth);
         } catch (JwtException ex) {
+            // Log at DEBUG to avoid noise in production logs for naturally expired tokens.
+            // The request continues unauthenticated; Spring Security will reject it at the endpoint layer.
             log.debug("Invalid JWT token: {}", ex.getMessage());
         }
         chain.doFilter(request, response);

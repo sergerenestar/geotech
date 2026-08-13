@@ -15,6 +15,18 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Business logic for client management.
+ *
+ * <p>A client is the top of the domain hierarchy (clients → projects → boreholes → …).
+ * Clients can be either organisations ("COMPANY") or individuals ("PERSON"). The {@code projectCount}
+ * field in every response is computed on-the-fly from the projects schema, since
+ * no FK relationship exists between the clients and projects tables
+ * (cross-schema joins are prohibited per architecture rules).
+ *
+ * <p>Client notes are free-text observations attached to a project-client relationship
+ * (e.g. meeting notes, special requests). They are not versioned or soft-deletable.
+ */
 @Service
 @RequiredArgsConstructor
 public class ClientService {
@@ -23,6 +35,11 @@ public class ClientService {
     private final ClientNoteRepository noteRepository;
     private final ProjectRepository projectRepository;
 
+    /**
+     * Returns all clients ordered by creation date descending, with a live project count.
+     * The project count uses a separate query per client — acceptable for current scale
+     * but should be replaced with a JOIN or sub-select if the client list grows large.
+     */
     public List<ClientResponse> getClients() {
         return clientRepository.findAllByOrderByCreatedAtDesc().stream()
                 .map(c -> ClientResponse.from(c, projectRepository.countByClientId(c.getId())))

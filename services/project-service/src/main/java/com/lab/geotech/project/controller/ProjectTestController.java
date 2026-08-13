@@ -14,6 +14,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * REST controller for a project's test catalogue.
+ *
+ * <p>Base path: {@code /api/projects/{projectId}/tests}
+ *
+ * <p>Endpoints:
+ * <ul>
+ *   <li>{@code GET    /}                    — list all test types in the catalogue</li>
+ *   <li>{@code POST   /}                    — replace the entire catalogue (destructive)</li>
+ *   <li>{@code PATCH  /{testId}/assign}     — assign technician, priority, and deadline</li>
+ *   <li>{@code DELETE /{testType}}          — remove one test type (by enum name, e.g. PROCTOR)</li>
+ *   <li>{@code PATCH  /{testType}}          — update the lab manager for one test type</li>
+ * </ul>
+ */
 @RestController
 @RequestMapping("/api/projects/{projectId}/tests")
 @RequiredArgsConstructor
@@ -27,6 +41,11 @@ public class ProjectTestController {
         return ResponseEntity.ok(ApiResponse.success(service.getByProject(projectId), "OK"));
     }
 
+    /**
+     * Replaces the entire test catalogue for a project.
+     * All existing tests are deleted and recreated from {@code dto.testTypes}.
+     * This resets any in-flight technician assignments and workflow states.
+     */
     @PostMapping
     public ResponseEntity<ApiResponse<List<ProjectTestResponse>>> set(
             @PathVariable UUID projectId,
@@ -51,6 +70,10 @@ public class ProjectTestController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Updates the lab manager for a single test type.
+     * Accepts a JSON body {@code { "labManagerId": "uuid-string" }}; null UUID clears the assignment.
+     */
     @PatchMapping("/{testType}")
     public ResponseEntity<ApiResponse<ProjectTestResponse>> updateManager(
             @PathVariable UUID projectId,

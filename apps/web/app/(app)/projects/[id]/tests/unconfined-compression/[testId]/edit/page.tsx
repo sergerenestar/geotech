@@ -82,7 +82,7 @@ export default function EditUcTestPage() {
           readings: validReadings,
         },
       });
-      router.push(`/projects/${projectId}/tests/unconfined-compression/${testId}`);
+      router.push(`/projects/${projectId}`);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Erreur lors de la mise à jour.');
     }

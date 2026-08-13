@@ -19,6 +19,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * REST controller for the Project resource.
+ *
+ * <p>Base path: {@code /api/projects}
+ *
+ * <p>Project access is role-scoped:
+ * <ul>
+ *   <li>ADMIN / LAB_MANAGER — {@code GET /} returns all projects (paginated).</li>
+ *   <li>PROJECT_MANAGER (default) — {@code GET /mine} returns projects they created.</li>
+ *   <li>LAB_MANAGER — {@code GET /mine} returns projects with at least one test assigned to them.</li>
+ *   <li>TECHNICIAN / USER — {@code GET /mine} returns projects with a test assigned to them.</li>
+ *   <li>CLIENT — {@code GET /mine} returns projects linked to their client account
+ *       (client UUID is read from the {@code clientId} JWT claim, not the principal UUID).</li>
+ * </ul>
+ */
 @RestController
 @RequestMapping("/api/projects")
 @RequiredArgsConstructor
@@ -26,6 +41,13 @@ public class ProjectController {
 
     private final ProjectService projectService;
 
+    /**
+     * Returns a paginated list of projects visible to the authenticated user.
+     *
+     * <p>The project set returned depends on the caller's role (see class Javadoc).
+     * CLIENT users have their {@code clientId} resolved from the JWT {@code details} map
+     * populated by {@link com.lab.geotech.project.security.JwtValidationFilter}.
+     */
     @GetMapping("/mine")
     public ResponseEntity<ApiResponse<PagedResponse<ProjectResponse>>> getMyProjects(
             @AuthenticationPrincipal String userId,

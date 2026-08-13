@@ -13,6 +13,7 @@ public record CbrTestCreateDto(
         UUID sampleId,
         String reference,
         @NotNull BigDecimal specificGravity,
+        BigDecimal moldVolumeCm3,
         BigDecimal proctorGdmaxTm3,
         BigDecimal proctorOmcPct,
         BigDecimal ringCoefficient,

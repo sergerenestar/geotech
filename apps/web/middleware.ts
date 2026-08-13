@@ -1,3 +1,19 @@
+/**
+ * Next.js edge middleware — route-level session guard.
+ *
+ * Uses the presence of the HttpOnly `refresh_token` cookie as a lightweight session signal.
+ * The cookie is set by the auth-service and is not readable by client JavaScript, so this
+ * middleware cannot validate its contents — it only checks existence.
+ *
+ * Behaviour:
+ * - Public paths (/login, auth API routes): allowed through; if a session cookie already
+ *   exists and the user tries to navigate to /login they are redirected to /projects.
+ * - All other paths: redirect to /login if no session cookie is present.
+ *
+ * The matcher excludes Next.js static assets and locale JSON files to avoid unnecessary
+ * middleware invocations on non-page requests.
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 
 const PUBLIC_PATHS = ['/login', '/api/auth/login', '/api/auth/refresh'];

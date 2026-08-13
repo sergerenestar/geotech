@@ -3,13 +3,21 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/api';
 
+/**
+ * React Query hooks for ASTM D-2216 water-content test results.
+ * Communicates with the `test-wc-service` via the Nginx gateway at `/api/tests/water-content`.
+ */
+
+/** Raw determination inputs sent by the technician. */
 export interface WcDeterminationInput {
   massContainerG: number;
   massContainerWetSoilG: number;
   massContainerDrySoilG: number;
 }
 
+/** Payload for creating or updating a water-content test. */
 export interface WcCreatePayload {
+  /** Logical sample UUID (optional — a test can be linked to a project without a specific sample). */
   sampleId?: string;
   projectId?: string;
   boreholeId?: string;
@@ -18,6 +26,7 @@ export interface WcCreatePayload {
   determinations: WcDeterminationInput[];
 }
 
+/** Server-calculated determination result (masses and derived w%). */
 export interface WcDeterminationResult {
   id: string;
   determinationNumber: number;
@@ -29,6 +38,12 @@ export interface WcDeterminationResult {
   waterContentPct: number;
 }
 
+/**
+ * A complete water-content test result as returned by the test-wc-service.
+ *
+ * `status` follows the test-result status machine: PENDING_REVIEW → FLAGGED → APPROVED / REJECTED → LOCKED.
+ * `aiFlag` is set by the rule-based anomaly service; LAB_MANAGER has final authority regardless of the flag.
+ */
 export interface WcTest {
   id: string;
   sampleId?: string;
@@ -38,7 +53,9 @@ export interface WcTest {
   status: string;
   temperatureC?: number;
   notes?: string;
+  /** Average of all determination water contents (%), computed server-side. */
   averageWaterContentPct?: number;
+  /** AI anomaly flag. NONE = no anomaly; WARNING / ERROR = flagged by rule engine. */
   aiFlag: 'NONE' | 'WARNING' | 'ERROR';
   aiFlagMessage?: string;
   determinations: WcDeterminationResult[];

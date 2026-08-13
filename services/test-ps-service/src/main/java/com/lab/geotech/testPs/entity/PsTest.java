@@ -49,6 +49,12 @@ public class PsTest {
     @Column(name = "test_type", nullable = false, length = 20)
     private PsTestType testType;
 
+    @Column(name = "sample_mass_g", precision = 10, scale = 3)
+    private BigDecimal sampleMassG;
+
+    @Column(name = "water_content_pct", precision = 6, scale = 2)
+    private BigDecimal waterContentPct;
+
     @Column(name = "total_dry_mass_g", nullable = false, precision = 10, scale = 3)
     private BigDecimal totalDryMassG;
 
@@ -90,6 +96,12 @@ public class PsTest {
 
     @Column(name = "uscs_name", length = 100)
     private String uscsName;
+
+    @Column(name = "material_type", length = 50)
+    private String materialType;
+
+    @Column(name = "applicable_norm", length = 100)
+    private String applicableNorm;
 
     @Column(columnDefinition = "TEXT")
     private String notes;

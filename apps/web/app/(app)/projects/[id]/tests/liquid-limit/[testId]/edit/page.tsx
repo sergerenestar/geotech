@@ -57,7 +57,7 @@ export default function EditLlTestPage() {
     if (plDeterminations.length < 2) { setError('Au moins 2 déterminations LP sont requises.'); return; }
     try {
       await updateTest.mutateAsync({ testId, payload: { projectId, method, notes: notes || undefined, casagrandePoints, plDeterminations } });
-      router.push(`/projects/${projectId}/tests/liquid-limit/${testId}`);
+      router.push(`/projects/${projectId}`);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Erreur lors de la mise à jour.');
     }

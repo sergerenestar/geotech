@@ -3,13 +3,17 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { configureApi } from '@/lib/api';
 
+/** Decoded user profile from the JWT, stored in React state after login/refresh. */
 interface AuthUser {
   id: string;
   email: string;
   firstName: string;
   lastName: string;
+  /** One of: ADMIN | LAB_MANAGER | PROJECT_MANAGER | TECHNICIAN | USER | CLIENT. */
   role: string;
+  /** Preferred UI language ("fr" or "en"). */
   language: string;
+  /** Only present for CLIENT-role users; used to scope project queries. */
   clientId?: string;
 }
 
@@ -23,6 +27,17 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+/**
+ * Manages authentication state for the entire application.
+ *
+ * Token storage strategy:
+ * - Access token: kept in React state (in-memory). Never written to localStorage to avoid XSS.
+ * - Refresh token: stored server-side in an HttpOnly cookie, invisible to JavaScript.
+ *
+ * On mount, `refresh()` is called to restore a session from the cookie if one exists.
+ * The `tokenRef` is a mutable ref that always mirrors `accessToken` state — it lets
+ * `configureApi` capture a stable getter closure that doesn't stale-close over an old state value.
+ */
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);

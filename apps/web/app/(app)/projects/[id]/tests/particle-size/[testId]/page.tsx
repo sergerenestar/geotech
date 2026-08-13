@@ -7,6 +7,7 @@ import Button from '@/components/ui/Button';
 import { usePsTest, useUpdatePsTestStatus } from '@/hooks/usePsTests';
 import GrainSizeCurve from '@/components/charts/GrainSizeCurve';
 import { useState } from 'react';
+import { getMaterialType } from '@/lib/materialTypes';
 
 const STATUS_TRANSITIONS: Record<string, string[]> = {
   DRAFT: ['IN_PROGRESS'],
@@ -39,6 +40,7 @@ export default function PsTestResultsPage() {
   const transitions = STATUS_TRANSITIONS[test.status] ?? [];
   const col = 'border border-gray-200 px-3 py-2 text-sm';
   const [showCctp, setShowCctp] = useState(false);
+  const materialType = getMaterialType(test.materialType);
 
   return (
     <div className="max-w-5xl mx-auto p-6 space-y-6">
@@ -52,6 +54,14 @@ export default function PsTestResultsPage() {
           <Button variant="secondary" onClick={() => router.push(`/projects/${projectId}`)}>Retour</Button>
         </div>
       </div>
+
+      {materialType && (
+        <div className="flex items-center gap-3 rounded-lg border border-brand-200 bg-brand-50 px-4 py-3 text-sm">
+          <span className="font-semibold text-brand-800">{materialType.label}</span>
+          <span className="text-gray-400">·</span>
+          <span className="font-mono text-gray-600">{materialType.norm}</span>
+        </div>
+      )}
 
       {test.aiFlag !== 'NONE' && (
         <div className={`rounded-lg border px-4 py-3 text-sm ${AI_FLAG_STYLES[test.aiFlag]}`}>
@@ -122,6 +132,14 @@ export default function PsTestResultsPage() {
 
       <Card className="p-6 space-y-4">
         <h2 className="text-lg font-semibold text-gray-800">Résultats par tamis</h2>
+        {materialType?.sieves.some(s => s.specMin != null) && (
+          <p className="text-xs text-gray-500">
+            <span className="inline-block w-3 h-3 rounded-full bg-green-500 mr-1" />
+            Dans la plage de spécification ·
+            <span className="inline-block w-3 h-3 rounded-full bg-red-500 mx-1" />
+            Hors spécification ({materialType.norm})
+          </p>
+        )}
         <div className="overflow-x-auto">
           <table className="w-full text-sm border-collapse">
             <thead>
@@ -131,28 +149,51 @@ export default function PsTestResultsPage() {
                 <th className={col}>Masse retenue (g)</th>
                 <th className={col}>% retenu</th>
                 <th className={col}>% passant</th>
+                {materialType?.sieves.some(s => s.specMin != null) && (
+                  <th className={col}>Spécification</th>
+                )}
               </tr>
             </thead>
             <tbody>
               {test.sieveResults
                 .slice()
                 .sort((a, b) => b.openingMm - a.openingMm)
-                .map(s => (
-                  <tr key={s.id} className="hover:bg-gray-50">
-                    <td className={`${col} font-medium`}>{s.sieveLabel}</td>
-                    <td className={`${col} text-center text-gray-500`}>{s.openingMm}</td>
-                    <td className={`${col} text-right`}>{s.massRetainedG.toFixed(2)}</td>
-                    <td className={`${col} text-right text-gray-500`}>
-                      {s.pctRetained != null ? `${s.pctRetained.toFixed(1)}%` : '—'}
-                    </td>
-                    <td className={`${col} text-right font-medium ${
-                      s.openingMm === 4.75 ? 'text-blue-700' :
-                      s.openingMm === 0.075 ? 'text-violet-700' : 'text-gray-700'
-                    }`}>
-                      {s.pctFiner != null ? `${s.pctFiner.toFixed(1)}%` : '—'}
-                    </td>
-                  </tr>
-                ))}
+                .map(s => {
+                  const spec = materialType?.sieves.find(
+                    m => Math.abs(m.openingMm - s.openingMm) < 0.001
+                  );
+                  const inSpec = spec?.specMin != null && s.pctFiner != null
+                    ? s.pctFiner >= spec.specMin && s.pctFiner <= (spec.specMax ?? 100)
+                    : null;
+                  return (
+                    <tr key={s.id} className="hover:bg-gray-50">
+                      <td className={`${col} font-medium`}>{s.sieveLabel}</td>
+                      <td className={`${col} text-center text-gray-500`}>{s.openingMm}</td>
+                      <td className={`${col} text-right`}>{s.massRetainedG.toFixed(2)}</td>
+                      <td className={`${col} text-right text-gray-500`}>
+                        {s.pctRetained != null ? `${s.pctRetained.toFixed(1)}%` : '—'}
+                      </td>
+                      <td className={`${col} text-right font-medium ${
+                        inSpec === true ? 'text-green-700' :
+                        inSpec === false ? 'text-red-600' :
+                        s.openingMm === 4.75 ? 'text-blue-700' :
+                        s.openingMm === 0.075 ? 'text-violet-700' : 'text-gray-700'
+                      }`}>
+                        {s.pctFiner != null ? `${s.pctFiner.toFixed(1)}%` : '—'}
+                      </td>
+                      {materialType?.sieves.some(m => m.specMin != null) && (
+                        <td className={`${col} text-center text-xs ${
+                          inSpec === true ? 'text-green-700' :
+                          inSpec === false ? 'text-red-600' : 'text-gray-400'
+                        }`}>
+                          {spec?.specMin != null
+                            ? `${spec.specMin}–${spec.specMax}%`
+                            : '—'}
+                        </td>
+                      )}
+                    </tr>
+                  );
+                })}
             </tbody>
           </table>
         </div>

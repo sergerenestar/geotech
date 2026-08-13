@@ -12,6 +12,23 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Centralised exception-to-HTTP-response mapping for the project-service.
+ *
+ * <p>All responses use the {@link ErrorResponse} envelope {@code { error, code, timestamp }},
+ * ensuring the API contract remains consistent regardless of which exception was thrown.
+ * Stack traces are never serialised to the response body (only logged server-side) to prevent
+ * information disclosure.
+ *
+ * <p>Exception hierarchy handled:
+ * <ul>
+ *   <li>{@code MethodArgumentNotValidException} — 400 with per-field validation errors.</li>
+ *   <li>{@code ProjectNotFoundException} / {@code ResourceNotFoundException} — 404.</li>
+ *   <li>{@code InvalidStatusTransitionException} / {@code InvalidWorkflowTransitionException} — 400.</li>
+ *   <li>{@code AccessDeniedException} — 403 (message intentionally generic to avoid enumeration).</li>
+ *   <li>{@code Exception} (catch-all) — 500, full stack trace logged at ERROR.</li>
+ * </ul>
+ */
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -35,14 +52,15 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(ex.getMessage(), "NOT_FOUND"));
     }
 
-    @ExceptionHandler(InvalidStatusTransitionException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidTransition(InvalidStatusTransitionException ex) {
+    @ExceptionHandler({InvalidStatusTransitionException.class, InvalidWorkflowTransitionException.class})
+    public ResponseEntity<ErrorResponse> handleInvalidTransition(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ErrorResponse.of(ex.getMessage(), "INVALID_STATUS_TRANSITION"));
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex) {
+        // Return a generic message to avoid leaking which specific user/resource was checked.
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(ErrorResponse.of("Access denied", "ACCESS_DENIED"));
     }

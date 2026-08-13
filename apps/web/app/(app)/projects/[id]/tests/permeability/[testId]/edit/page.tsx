@@ -101,7 +101,7 @@ export default function EditPermTestPage() {
           })),
         },
       });
-      router.push(`/projects/${projectId}/tests/permeability/${testId}`);
+      router.push(`/projects/${projectId}`);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Erreur lors de la mise à jour.');
     }

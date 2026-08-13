@@ -49,6 +49,9 @@ public class CbrTest {
     @Column(name = "specific_gravity", precision = 6, scale = 4, nullable = false)
     private BigDecimal specificGravity;
 
+    @Column(name = "mold_volume_cm3", precision = 10, scale = 3)
+    private BigDecimal moldVolumeCm3;
+
     @Column(name = "proctor_gdmax_tm3", precision = 8, scale = 4)
     private BigDecimal proctorGdmaxTm3;
 

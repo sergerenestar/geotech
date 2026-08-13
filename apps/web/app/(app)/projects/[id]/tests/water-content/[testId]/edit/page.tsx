@@ -8,6 +8,16 @@ import Input from '@/components/ui/Input';
 import WcDeterminationTable from '@/components/tests/WcDeterminationTable';
 import { useWcTest, useUpdateWcTest, WcDeterminationInput } from '@/hooks/useWcTests';
 
+/**
+ * Edit page for an existing ASTM D-2216 water-content test.
+ *
+ * Follows the same pattern as the other test edit pages:
+ * 1. Fetch the existing test via `useWcTest(testId)`.
+ * 2. Seed local form state from the response once on mount (`ready` guard prevents
+ *    re-seeding if the query refetches after the user has started editing).
+ * 3. On submit, call `PUT /api/tests/water-content/{testId}` via `useUpdateWcTest`.
+ * 4. Redirect back to the project page on success.
+ */
 export default function EditWcTestPage() {
   const { id: projectId, testId } = useParams<{ id: string; testId: string }>();
   const router = useRouter();
@@ -18,6 +28,7 @@ export default function EditWcTestPage() {
   const [notes, setNotes] = useState('');
   const [determinations, setDeterminations] = useState<WcDeterminationInput[]>([]);
   const [error, setError] = useState('');
+  // Prevents the useEffect from overwriting user edits when the query refetches
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -50,7 +61,7 @@ export default function EditWcTestPage() {
           determinations,
         },
       });
-      router.push(`/projects/${projectId}/tests/water-content/${testId}`);
+      router.push(`/projects/${projectId}`);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Erreur lors de la mise à jour.');
     }

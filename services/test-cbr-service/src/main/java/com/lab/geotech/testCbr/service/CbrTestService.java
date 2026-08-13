@@ -32,8 +32,7 @@ public class CbrTestService {
     private final CbrCalculationService calculationService;
 
     private static final Map<TestStatus, Set<TestStatus>> TRANSITIONS = new EnumMap<>(TestStatus.class);
-    // Standard mold volume (cm³) for CBR — NF P94-078 cylindrical mold
-    private static final BigDecimal MOLD_VOLUME_CM3 = new BigDecimal("2332.0");
+    private static final BigDecimal DEFAULT_MOLD_VOLUME_CM3 = new BigDecimal("2332.0");
 
     static {
         TRANSITIONS.put(DRAFT,          EnumSet.of(IN_PROGRESS, PENDING_REVIEW));
@@ -51,6 +50,9 @@ public class CbrTestService {
         BigDecimal gs = dto.specificGravity() != null
                 ? dto.specificGravity()
                 : new BigDecimal("2.70");
+        BigDecimal moldVol = dto.moldVolumeCm3() != null
+                ? dto.moldVolumeCm3()
+                : DEFAULT_MOLD_VOLUME_CM3;
 
         CbrTest test = CbrTest.builder()
                 .projectId(dto.projectId())
@@ -60,6 +62,7 @@ public class CbrTestService {
                 .reference(dto.reference())
                 .status(IN_PROGRESS)
                 .specificGravity(gs)
+                .moldVolumeCm3(moldVol)
                 .proctorGdmaxTm3(dto.proctorGdmaxTm3())
                 .proctorOmcPct(dto.proctorOmcPct())
                 .ringCoefficient(rc)
@@ -69,7 +72,7 @@ public class CbrTestService {
         if (dto.intensities() != null) {
             for (var intensityDto : dto.intensities()) {
                 CbrIntensity intensity = calculationService.buildIntensity(
-                        intensityDto, rc, dto.proctorGdmaxTm3(), MOLD_VOLUME_CM3);
+                        intensityDto, rc, dto.proctorGdmaxTm3(), moldVol);
                 intensity.setCbrTest(test);
                 test.getIntensities().add(intensity);
             }
@@ -107,9 +110,12 @@ public class CbrTestService {
     public CbrTestResponse update(UUID id, CbrTestCreateDto dto) {
         CbrTest test = findOrThrow(id);
         BigDecimal rc = dto.ringCoefficient() != null ? dto.ringCoefficient() : test.getRingCoefficient();
+        BigDecimal moldVol = dto.moldVolumeCm3() != null ? dto.moldVolumeCm3()
+                : (test.getMoldVolumeCm3() != null ? test.getMoldVolumeCm3() : DEFAULT_MOLD_VOLUME_CM3);
 
         test.setReference(dto.reference());
         test.setSpecificGravity(dto.specificGravity() != null ? dto.specificGravity() : test.getSpecificGravity());
+        test.setMoldVolumeCm3(moldVol);
         test.setProctorGdmaxTm3(dto.proctorGdmaxTm3());
         test.setProctorOmcPct(dto.proctorOmcPct());
         test.setRingCoefficient(rc);
@@ -119,7 +125,7 @@ public class CbrTestService {
         if (dto.intensities() != null) {
             for (var intensityDto : dto.intensities()) {
                 CbrIntensity intensity = calculationService.buildIntensity(
-                        intensityDto, rc, dto.proctorGdmaxTm3(), MOLD_VOLUME_CM3);
+                        intensityDto, rc, dto.proctorGdmaxTm3(), moldVol);
                 intensity.setCbrTest(test);
                 test.getIntensities().add(intensity);
             }

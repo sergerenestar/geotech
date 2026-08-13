@@ -15,6 +15,16 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Business logic for boreholes — the second level of the domain hierarchy
+ * projects → boreholes (BH-01, BH-02, …) → samples → test results.
+ *
+ * <p>A borehole belongs to exactly one project. It has an optional GPS location
+ * (latitude/longitude) and groundwater depth reading recorded at drilling time.
+ * Soft-delete cascades from the parent project via
+ * {@link ProjectService#softDelete}, but individual boreholes can also be
+ * soft-deleted independently.
+ */
 @Service
 @RequiredArgsConstructor
 public class BoreholeService {

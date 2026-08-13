@@ -6,12 +6,14 @@ import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { useProctorTest, useUpdateProctorTest, ProctorPointInput } from '@/hooks/useProctorTests';
+import { useSgTestsByProject } from '@/hooks/useSgTests';
 
 export default function EditProctorTestPage() {
   const { id: projectId, testId } = useParams<{ id: string; testId: string }>();
   const router = useRouter();
   const { data: test, isLoading } = useProctorTest(testId);
   const updateTest = useUpdateProctorTest();
+  const { data: sgTests = [] } = useSgTestsByProject(projectId as string);
 
   const [method, setMethod] = useState<'STANDARD' | 'MODIFIED'>('STANDARD');
   const [moldVolumeCm3, setMoldVolumeCm3] = useState('944');
@@ -27,7 +29,9 @@ export default function EditProctorTestPage() {
       setMethod(test.method);
       setMoldVolumeCm3(String(test.moldVolumeCm3));
       setMoldMassG(String(test.moldMassG));
-      setSpecificGravity(String(test.specificGravity));
+      const sgFromTest = test.specificGravity;
+      const latestSg = sgTests.find(t => t.gsAverage != null)?.gsAverage;
+      setSpecificGravity(latestSg != null ? String(latestSg.toFixed(4)) : String(sgFromTest));
       setNotes(test.notes ?? '');
       setPoints(test.points.map(p => ({
         massMoldSoilG: String(p.massMoldSoilG),
@@ -69,7 +73,7 @@ export default function EditProctorTestPage() {
         testId,
         payload: { projectId, method, moldVolumeCm3: moldVol, moldMassG: moldMass, specificGravity: gs, notes: notes || undefined, points: validPoints },
       });
-      router.push(`/projects/${projectId}/tests/proctor/${testId}`);
+      router.push(`/projects/${projectId}`);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Erreur lors de la mise à jour.');
     }
@@ -98,17 +102,11 @@ export default function EditProctorTestPage() {
                 <option value="MODIFIED">Modifié (D-1557)</option>
               </select>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Volume moule (cm³)</label>
-              <select value={moldVolumeCm3} onChange={e => setMoldVolumeCm3(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
-                <option value="944">944 cm³ (4 pouces)</option>
-                <option value="2124">2124 cm³ (6 pouces)</option>
-              </select>
-            </div>
+            <Input label="Volume moule (cm³)" type="number" step="0.01" required
+              value={moldVolumeCm3} onChange={e => setMoldVolumeCm3(e.target.value)} placeholder="ex: 944" />
             <Input label="Masse moule vide (g)" type="number" step="0.1" required
               value={moldMassG} onChange={e => setMoldMassG(e.target.value)} placeholder="ex: 4250" />
-            <Input label="Densité relative (Gs)" type="number" step="0.001"
+            <Input label="Poids Spécifique (Gs)" type="number" step="0.001"
               value={specificGravity} onChange={e => setSpecificGravity(e.target.value)} placeholder="2.70" />
             <div className="col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>

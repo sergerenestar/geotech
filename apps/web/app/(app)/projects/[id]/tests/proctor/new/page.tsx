@@ -1,21 +1,34 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { useCreateProctorTest, ProctorPointInput } from '@/hooks/useProctorTests';
+import { useSgTestsByProject } from '@/hooks/useSgTests';
 
 export default function NewProctorTestPage() {
   const { id: projectId } = useParams<{ id: string }>();
   const router = useRouter();
   const createTest = useCreateProctorTest();
+  const { data: sgTests = [] } = useSgTestsByProject(projectId as string);
+  const [gsPrefilled, setGsPrefilled] = useState(false);
 
   const [method, setMethod] = useState<'STANDARD' | 'MODIFIED'>('STANDARD');
   const [moldVolumeCm3, setMoldVolumeCm3] = useState('944');
   const [moldMassG, setMoldMassG] = useState('');
   const [specificGravity, setSpecificGravity] = useState('2.70');
+
+  useEffect(() => {
+    if (!gsPrefilled && sgTests.length > 0) {
+      const latest = sgTests.find(t => t.gsAverage != null) ?? sgTests[0];
+      if (latest?.gsAverage != null) {
+        setSpecificGravity(String(latest.gsAverage.toFixed(4)));
+        setGsPrefilled(true);
+      }
+    }
+  }, [sgTests, gsPrefilled]);
   const [notes, setNotes] = useState('');
   const [error, setError] = useState('');
 
@@ -91,17 +104,11 @@ export default function NewProctorTestPage() {
                 <option value="MODIFIED">Modifié (D-1557)</option>
               </select>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Volume moule (cm³)</label>
-              <select value={moldVolumeCm3} onChange={e => setMoldVolumeCm3(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
-                <option value="944">944 cm³ (4 pouces)</option>
-                <option value="2124">2124 cm³ (6 pouces)</option>
-              </select>
-            </div>
+            <Input label="Volume moule (cm³)" type="number" step="0.01" required
+              value={moldVolumeCm3} onChange={e => setMoldVolumeCm3(e.target.value)} placeholder="ex: 944" />
             <Input label="Masse moule vide (g)" type="number" step="0.1" required
               value={moldMassG} onChange={e => setMoldMassG(e.target.value)} placeholder="ex: 4250" />
-            <Input label="Densité relative (Gs)" type="number" step="0.001"
+            <Input label="Poids Spécifique (Gs)" type="number" step="0.001"
               value={specificGravity} onChange={e => setSpecificGravity(e.target.value)} placeholder="2.70" />
             <div className="col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>

@@ -35,6 +35,7 @@ export interface CbrCreatePayload {
   sampleId?: string;
   reference?: string;
   specificGravity: number;
+  moldVolumeCm3?: number;
   proctorGdmaxTm3?: number;
   proctorOmcPct?: number;
   ringCoefficient?: number;
@@ -81,6 +82,7 @@ export interface CbrTest {
   reference?: string;
   status: string;
   specificGravity: number;
+  moldVolumeCm3?: number;
   proctorGdmaxTm3?: number;
   proctorOmcPct?: number;
   ringCoefficient: number;

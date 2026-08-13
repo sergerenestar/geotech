@@ -241,7 +241,7 @@ public class PsCalculationService {
             return new PsDiameters(null, null, null, null, null);
         }
 
-        // Sort by openingMm descending (largest first = lowest pct_finer)
+        // Sort by openingMm descending (largest first = highest pct_finer, since large sieves pass more material)
         List<GradationPoint> sorted = allPoints.stream()
                 .filter(p -> p.openingMm() > 0 && p.pctFiner() >= 0)
                 .sorted(Comparator.comparingDouble(GradationPoint::openingMm).reversed())
@@ -273,37 +273,39 @@ public class PsCalculationService {
 
     /**
      * Log-linear interpolation to find diameter at a given pct_finer percentage x%.
-     * Points are sorted descending by openingMm (ascending by pctFiner).
+     * Points are sorted descending by openingMm, so pctFiner also decreases from first to last.
+     * p0 (larger opening) has higher pctFiner; p1 (smaller opening) has lower pctFiner.
      */
     private BigDecimal interpolateDiameter(List<GradationPoint> points, double targetPct) {
-        // Walk list: openingMm descending → pctFiner ascending
-        // Find bracketing points where pctFiner crosses targetPct
-        GradationPoint lower = null;
-        GradationPoint upper = null;
+        // Walk list: openingMm descending → pctFiner descending.
+        // Find adjacent pair where pctFiner straddles targetPct:
+        //   p0.pctFiner >= targetPct > p1.pctFiner
+        GradationPoint above = null; // larger opening, pctFiner >= target
+        GradationPoint below = null; // smaller opening, pctFiner <= target
 
         for (int i = 0; i < points.size() - 1; i++) {
-            GradationPoint p0 = points.get(i);   // higher opening, lower pctFiner
-            GradationPoint p1 = points.get(i + 1); // lower opening, higher pctFiner
+            GradationPoint p0 = points.get(i);      // larger opening, higher pctFiner
+            GradationPoint p1 = points.get(i + 1);  // smaller opening, lower pctFiner
 
-            if (p0.pctFiner() <= targetPct && p1.pctFiner() >= targetPct) {
-                lower = p0; // pctFiner below target, larger diameter
-                upper = p1; // pctFiner above target, smaller diameter
+            if (p0.pctFiner() >= targetPct && p1.pctFiner() <= targetPct) {
+                above = p0;
+                below = p1;
                 break;
             }
         }
 
-        if (lower == null || upper == null) return null;
+        if (above == null || below == null) return null;
 
         // Guard against identical pctFiner values
-        double pRange = upper.pctFiner() - lower.pctFiner();
-        if (Math.abs(pRange) < 1e-9) return BigDecimal.valueOf(lower.openingMm()).setScale(6, ROUNDING);
+        double pRange = above.pctFiner() - below.pctFiner();
+        if (Math.abs(pRange) < 1e-9) return BigDecimal.valueOf(above.openingMm()).setScale(6, ROUNDING);
 
-        // Log-linear interpolation:
-        // D_x = 10^( log10(D_lower) + (x - P_lower)/(P_upper - P_lower) * (log10(D_upper) - log10(D_lower)) )
-        double logDLower = Math.log10(lower.openingMm());
-        double logDUpper = Math.log10(upper.openingMm());
-        double fraction = (targetPct - lower.pctFiner()) / pRange;
-        double logD = logDLower + fraction * (logDUpper - logDLower);
+        // Log-linear interpolation between above (larger D, higher %) and below (smaller D, lower %):
+        // D_x = 10^( log10(D_above) + (targetPct - P_above)/(P_below - P_above) * (log10(D_below) - log10(D_above)) )
+        double logDAbove = Math.log10(above.openingMm());
+        double logDBelow = Math.log10(below.openingMm());
+        double fraction = (targetPct - above.pctFiner()) / (below.pctFiner() - above.pctFiner());
+        double logD = logDAbove + fraction * (logDBelow - logDAbove);
         double d = Math.pow(10.0, logD);
 
         return BigDecimal.valueOf(d).setScale(6, ROUNDING);
